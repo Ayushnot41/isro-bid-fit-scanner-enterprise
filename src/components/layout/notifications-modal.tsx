@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import {
@@ -171,10 +172,25 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 ];
 
 export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [activeTab, setActiveTab] = useState<"ALL" | "AI_INSIGHT" | "TENDER" | "STATUTORY" | "SUITE">("ALL");
   const [selectedInsight, setSelectedInsight] = useState<NotificationItem | null>(null);
   const [suiteCategory, setSuiteCategory] = useState<"WIN_SIM" | "MATERIALS" | "MSME" | "WEBCMD" | "PGVECTOR">("WIN_SIM");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Lock background scroll when notifications modal is open
   useLockBodyScroll(isOpen);
@@ -200,28 +216,30 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     return n.category === activeTab;
   });
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-end sm:p-6 p-2 bg-black/65 backdrop-blur-md overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-start justify-end p-3 sm:p-6 pt-16 sm:pt-6 bg-black/70 backdrop-blur-sm overflow-hidden pointer-events-auto">
           {/* Backdrop Click to Close */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0"
+            className="absolute inset-0 cursor-pointer"
           />
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -15, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className={`relative z-10 w-full ${
-              activeTab === "SUITE" || selectedInsight ? "max-w-2xl" : "max-w-lg"
-            } bg-[#13161a] border border-emerald-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] mt-12 sm:mt-0 transition-all duration-300`}
+            exit={{ opacity: 0, y: -15, scale: 0.96 }}
+            transition={{ type: "spring", damping: 28, stiffness: 350 }}
+            className={`relative z-10 w-full sm:w-[500px] ${
+              activeTab === "SUITE" || selectedInsight ? "sm:w-[650px]" : ""
+            } h-[86vh] max-h-[86vh] bg-[#0e1115] border border-emerald-500/40 rounded-2xl shadow-2xl shadow-black overflow-hidden flex flex-col transition-all duration-300`}
           >
             {/* Modal Header */}
             <div className="flex-shrink-0 p-4 bg-[#0d0f12] border-b border-[#222730] flex items-center justify-between">
@@ -669,4 +687,6 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
       )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

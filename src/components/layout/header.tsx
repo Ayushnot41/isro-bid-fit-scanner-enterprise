@@ -36,12 +36,14 @@ export function Header() {
         </div>
 
         <button
+          type="button"
           aria-label="Notifications"
+          title="Open Autonomous Intelligence & Live Notifications"
           onClick={() => setShowNotifications(true)}
-          className="relative p-2 text-zinc-400 hover:text-white hover:bg-[#181c22] rounded-xl transition-all border border-transparent hover:border-[#222730]"
+          className="relative p-2.5 text-zinc-400 hover:text-white hover:bg-[#181c22] rounded-xl transition-all border border-transparent hover:border-[#222730] cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
         >
           <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-[#0d0f12]" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-[#0d0f12] animate-pulse" />
         </button>
 
         {/* Live Notifications Center Modal */}
