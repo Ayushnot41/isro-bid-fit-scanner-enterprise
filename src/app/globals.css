@@ -113,4 +113,24 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  @keyframes heroOrbit {
+    0% {
+      transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(0deg);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(360deg);
+    }
+  }
+
+  .hero-3d-active {
+    animation: heroOrbit 16s linear infinite;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .hero-3d-static {
+    transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(45deg);
+    transform-style: preserve-3d;
+  }
 }

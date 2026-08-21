@@ -32,7 +32,10 @@ export default function RootLayout({
       className={`dark ${inter.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-sans bg-[#08090a] text-zinc-100 antialiased">
+      <body
+        className="font-sans bg-[#08090a] text-zinc-100 antialiased"
+        suppressHydrationWarning
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

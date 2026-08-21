@@ -278,26 +278,6 @@ export function TenderkartLanding() {
 
           {/* Right Column: 3D Aerospace Hardware Showcase Component */}
           <div className="lg:col-span-5 relative">
-            <style jsx>{`
-              @keyframes heroOrbit {
-                0% {
-                  transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(0deg);
-                }
-                100% {
-                  transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(360deg);
-                }
-              }
-              .hero-3d-active {
-                animation: heroOrbit 16s linear infinite;
-                transform-style: preserve-3d;
-                will-change: transform;
-              }
-              .hero-3d-static {
-                transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(45deg);
-                transform-style: preserve-3d;
-              }
-            `}</style>
-
             <div className="relative p-6 rounded-3xl bg-[#0e1115] border border-cyan-500/30 shadow-2xl shadow-cyan-950/20 overflow-hidden">
               {/* Header HUD */}
               <div className="flex items-center justify-between pb-3 border-b border-[#222730] text-xs font-mono">
@@ -707,12 +687,14 @@ export function TenderkartLanding() {
       </AnimatePresence>
 
       {/* AI Evaluation Modal */}
-      <AiEvaluationModal
-        tender={selectedTender}
-        evaluation={selectedEval}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {selectedTender && selectedEval && (
+        <AiEvaluationModal
+          tender={selectedTender}
+          evaluation={selectedEval}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
