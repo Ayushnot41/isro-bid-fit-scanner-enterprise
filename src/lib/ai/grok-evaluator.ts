@@ -54,7 +54,7 @@ Return a JSON object with:
           "X-Title": "ISRO Bid-Fit Scanner Enterprise",
         },
         body: JSON.stringify({
-          model: "x-ai/grok-4.20",
+          model: "x-ai/grok-2-1212",
           messages: [{ role: "user", content: prompt }],
           response_format: { type: "json_object" },
           temperature: 0.2,
