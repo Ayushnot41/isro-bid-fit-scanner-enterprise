@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Rocket, ShieldCheck, ArrowRight, Lock, Mail, KeyRound, Sparkles, Building2, UserCheck } from "lucide-react";
+import { Rocket, ShieldCheck, ArrowRight, Lock, Mail, KeyRound, Sparkles, Building2, UserCheck, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("supplier@aeroprecision.in");
   const [password, setPassword] = useState("••••••••••••");
   const [isLoading, setIsLoading] = useState(false);
@@ -158,5 +158,20 @@ export default function LoginPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#08090a] flex items-center justify-center text-zinc-400 font-mono text-xs">
+          <Loader2 className="w-5 h-5 animate-spin text-emerald-400 mr-2" />
+          <span>Loading Supplier Authentication...</span>
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

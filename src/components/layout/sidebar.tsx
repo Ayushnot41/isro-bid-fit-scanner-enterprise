@@ -17,7 +17,6 @@ import {
   Radar,
   Activity,
 } from "lucide-react";
-import { useClerk, UserButton } from "@clerk/nextjs";
 
 const navItems = [
   { href: "/dashboard", label: "Command Center", icon: LayoutDashboard },
@@ -30,18 +29,10 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { signOut } = useClerk();
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     document.cookie = "demo_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     document.cookie = "sb-access-token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    try {
-      if (signOut) {
-        await signOut({ redirectUrl: "/login" });
-      }
-    } catch {
-      // Ignore
-    }
     window.location.href = "/login";
   };
 
@@ -142,15 +133,10 @@ export function Sidebar() {
 
         <div className="flex items-center justify-between px-2 pt-1 border-t border-[#222730]/60">
           <div className="flex items-center gap-2">
-            <UserButton
-              afterSignOutUrl="/login"
-              appearance={{
-                elements: {
-                  avatarBox: "w-7 h-7",
-                },
-              }}
-            />
-            <span className="text-[11px] font-mono text-zinc-400 truncate max-w-[80px]">Account</span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 font-bold font-mono text-[10px] flex items-center justify-center">
+              AP
+            </div>
+            <span className="text-[11px] font-mono text-zinc-300 truncate max-w-[80px]">MSME Active</span>
           </div>
           <button
             type="button"
