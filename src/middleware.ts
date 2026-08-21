@@ -1,42 +1,38 @@
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
-  const isProtected =
-    req.nextUrl.pathname.startsWith("/dashboard") ||
-    req.nextUrl.pathname.startsWith("/tenders") ||
-    req.nextUrl.pathname.startsWith("/evaluations") ||
-    req.nextUrl.pathname.startsWith("/profile");
+// Routes that require authentication
+const isProtectedRoute = createRouteMatcher([
+  "/dashboard(.*)",
+  "/tenders(.*)",
+  "/evaluations(.*)",
+  "/profile(.*)",
+]);
 
-  const isAuthPage =
-    req.nextUrl.pathname === "/login" || req.nextUrl.pathname === "/register";
+// Routes for auth pages
+const isAuthRoute = createRouteMatcher(["/login(.*)", "/register(.*)"]);
 
-  const hasSession =
-    req.cookies.has("sb-access-token") ||
-    req.cookies.has("sb-refresh-token") ||
-    req.cookies.has("demo_session") ||
-    req.cookies.get("demo_session")?.value === "true";
+export default clerkMiddleware((auth, req) => {
+  const { userId } = auth();
 
-  // Allow access or redirect appropriately
-  if (isProtected && !hasSession) {
-    // In local development/demo mode, allow seamless access with fallback
-    return NextResponse.next();
+  // Redirect unauthenticated users away from protected routes
+  if (isProtectedRoute(req) && !userId) {
+    const signInUrl = new URL("/login", req.url);
+    signInUrl.searchParams.set("redirect_url", req.url);
+    return NextResponse.redirect(signInUrl);
   }
 
-  if (isAuthPage && hasSession) {
+  // Redirect authenticated users away from login/register
+  if (isAuthRoute(req) && userId) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/tenders/:path*",
-    "/evaluations/:path*",
-    "/profile/:path*",
-    "/login",
-    "/register",
+    // Skip Next.js internals and static files
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

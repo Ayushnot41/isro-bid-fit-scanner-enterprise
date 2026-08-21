@@ -15,7 +15,7 @@ import {
   ExternalLink,
   ShieldCheck,
 } from "lucide-react";
-import { useAuth } from "@/components/auth/auth-provider";
+import { useClerk, UserButton } from "@clerk/nextjs";
 
 const navItems = [
   { href: "/dashboard", label: "Command Center", icon: LayoutDashboard },
@@ -26,7 +26,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { signOut } = useAuth();
+  const { signOut } = useClerk();
 
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-[#0d0f12] border-r border-[#222730] flex flex-col z-40 selection:bg-emerald-500/30">
@@ -39,63 +39,61 @@ export function Sidebar() {
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
             className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-950/30 text-emerald-400"
           >
-            <Rocket className="w-5 h-5" />
+            <Rocket className="w-5 h-5 text-emerald-400" />
           </motion.div>
           <div>
             <div className="flex items-center gap-1.5">
-              <h1 className="text-sm font-bold text-white tracking-tight group-hover:text-emerald-400 transition-colors">
+              <span className="font-bold text-sm text-white tracking-tight">
                 ISRO Bid-Fit
-              </h1>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+              </span>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
                 PRO
               </span>
             </div>
-            <p className="text-[10px] font-mono text-zinc-500 tracking-wide uppercase">
-              Procurement HUD
+            <p className="text-[10px] text-zinc-500 font-mono">
+              PROCUREMENT HUD
             </p>
           </div>
         </Link>
       </div>
 
-      {/* Gateway Live Status Pill */}
-      <div className="mx-3.5 my-3 p-3 rounded-xl bg-[#13161a] border border-[#222730] text-xs">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5 font-mono">
+      {/* Telemetry Status Strip */}
+      <div className="px-5 py-3 border-b border-[#222730] bg-[#0a0b0e]">
+        <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <span className="flex items-center gap-1.5 text-zinc-300">
             <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
-            eproc.isro.gov.in
+            EPROC.ISRO.GOV.IN
           </span>
-          <span className="px-1.5 py-0.5 bg-emerald-500/15 text-emerald-400 font-mono text-[9px] rounded font-bold">
+          <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">
             LIVE
           </span>
         </div>
-        <p className="text-[11px] text-zinc-400 flex items-center gap-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 inline" />
+        <p className="text-[10px] text-zinc-500 mt-1 flex items-center gap-1 font-mono">
+          <ShieldCheck className="w-3 h-3 text-cyan-400" />
           Autonomous Scraper Active
         </p>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 px-3 py-2 space-y-1">
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const isActive = pathname === item.href;
           return (
             <Link key={item.href} href={item.href}>
               <motion.div
+                whileHover={{ x: 2 }}
                 whileTap={{ scale: 0.98 }}
                 className={cn(
-                  "flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all relative",
+                  "flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all relative",
                   isActive
-                    ? "text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 shadow-sm shadow-emerald-950/20"
-                    : "text-zinc-400 hover:text-white hover:bg-[#181c22] border border-transparent"
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 shadow-sm shadow-emerald-500/10"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-[#13161a]"
                 )}
               >
                 {isActive && (
                   <motion.div
-                    layoutId="sidebarActivePill"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-500 rounded-r-full"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    layoutId="activeNav"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-400 rounded-r-full"
                   />
                 )}
                 <div className="flex items-center gap-3">
@@ -113,25 +111,35 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer Info & Sign Out */}
-      <div className="p-3.5 border-t border-[#222730] space-y-1.5 bg-[#0a0b0e]">
+      {/* Footer Info & User Management */}
+      <div className="p-3.5 border-t border-[#222730] space-y-2 bg-[#0a0b0e]">
         <a
           href="https://eproc.isro.gov.in"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] text-zinc-500 hover:text-zinc-300 hover:bg-[#13161a] transition-colors"
+          className="flex items-center justify-between px-3 py-1.5 rounded-xl text-[11px] text-zinc-500 hover:text-zinc-300 hover:bg-[#13161a] transition-colors"
         >
           <span className="font-mono text-[10px]">Official Portal</span>
           <ExternalLink className="w-3 h-3" />
         </a>
 
-        <div className="flex items-center justify-between px-3 py-2">
-          <span className="text-[11px] font-mono text-zinc-500">AeroPrecision India</span>
+        <div className="flex items-center justify-between px-2 pt-1 border-t border-[#222730]/60">
+          <div className="flex items-center gap-2">
+            <UserButton
+              afterSignOutUrl="/login"
+              appearance={{
+                elements: {
+                  avatarBox: "w-7 h-7",
+                },
+              }}
+            />
+            <span className="text-[11px] font-mono text-zinc-400 truncate max-w-[80px]">Account</span>
+          </div>
           <button
-            onClick={() => signOut()}
-            className="flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-red-400 transition-colors"
+            onClick={() => signOut({ redirectUrl: "/login" })}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut className="w-3 h-3" />
             <span>Sign Out</span>
           </button>
         </div>
