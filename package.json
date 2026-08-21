@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@agentrhq/webcmd": "^0.7.4",
+    "@clerk/nextjs": "^5.7.6",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.45.0",
     "bullmq": "^6.2.0",

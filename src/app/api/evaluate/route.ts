@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { evaluateBidFit } from "@/lib/evaluation/engine";
+import { predictBidWithGroq } from "@/lib/ai/grok-evaluator";
 import { NextResponse } from "next/server";
 import type { VendorProfile, ScrapedTender } from "@/lib/types/database";
 import { DEMO_VENDOR_PROFILE, INITIAL_SCRAPED_TENDERS } from "@/lib/mock-data";
@@ -39,10 +40,9 @@ export async function POST(request: Request) {
         const { data: dbProfile } = await supabase
           .from("vendor_profiles")
           .select("*")
+          .eq("user_id", user.id)
           .single();
-        if (dbProfile) {
-          profile = dbProfile as VendorProfile;
-        }
+        if (dbProfile) profile = dbProfile as VendorProfile;
       } catch {
         profile = DEMO_VENDOR_PROFILE;
       }
@@ -57,24 +57,26 @@ export async function POST(request: Request) {
           .select("*")
           .eq("id", tenderId)
           .single();
-        if (dbTender) {
-          tender = dbTender as ScrapedTender;
-        }
+        if (dbTender) tender = dbTender as ScrapedTender;
       } catch {
         // fallback
       }
     }
 
     if (!tender) {
-      tender = INITIAL_SCRAPED_TENDERS.find((t) => t.id === tenderId) ||
-               INITIAL_SCRAPED_TENDERS.find((t) => t.reference_number === tenderId) ||
-               INITIAL_SCRAPED_TENDERS[0];
+      tender =
+        INITIAL_SCRAPED_TENDERS.find((t) => t.id === tenderId) ||
+        INITIAL_SCRAPED_TENDERS.find((t) => t.reference_number === tenderId) ||
+        INITIAL_SCRAPED_TENDERS[0];
     }
 
-    // 3. Run evaluation
-    const evaluation = evaluateBidFit(profile, tender);
+    // 3. Run deterministic evaluation + Groq AI prediction in parallel
+    const [evaluation, groqPrediction] = await Promise.all([
+      Promise.resolve(evaluateBidFit(profile, tender)),
+      predictBidWithGroq(tender, profile),
+    ]);
 
-    // 4. Try saving to DB if user & supabase are connected
+    // 4. Save to DB if authenticated
     if (supabase && user) {
       try {
         await supabase.from("bid_evaluations").insert({
@@ -93,7 +95,10 @@ export async function POST(request: Request) {
           msme_score: evaluation.msme_score,
           turnover_score: evaluation.turnover_score,
           capability_score: evaluation.capability_score,
-          evaluation_details: evaluation.evaluation_details,
+          evaluation_details: {
+            ...evaluation.evaluation_details,
+            groq_prediction: groqPrediction,
+          },
           recommendations: evaluation.recommendations,
         });
       } catch (err) {
@@ -104,6 +109,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       evaluation,
+      groq_prediction: groqPrediction,
+      ai_powered: !!process.env.GROQ_API_KEY,
       tender,
     });
   } catch (error) {
