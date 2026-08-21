@@ -15,6 +15,7 @@ import {
   Wrench,
   Radio,
   FileCheck,
+  Sparkles,
 } from "lucide-react";
 import DynamicStreamingText from "@/components/ui/dynamic-streaming-text";
 import { DEMO_VENDOR_PROFILE } from "@/lib/mock-data";
@@ -206,32 +207,80 @@ export function AiEvaluationModal({
 
                   <div className="p-3 rounded-xl bg-[#0a0b0e] border border-[#222730]">
                     <span className="text-zinc-400 block text-[10px] font-mono">COMMODITY SPOT INDEX:</span>
-                    <span className="font-bold text-cyan-400 block mt-1 font-mono">Rotterdam Ti-64 ($38.5/kg)</span>
-                    <span className="text-[11px] text-zinc-400 font-mono block mt-0.5">Hedge: +4.5% Buffer</span>
+                    <span className="font-bold text-cyan-400 block mt-1 font-mono">₹3,369 / kg (Ti-64 Spot)</span>
+                    <span className="text-[11px] text-zinc-400 font-mono block mt-0.5">Hedge: +4.5% Buffer (INR)</span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-[#0a0b0e] border border-[#222730]">
                     <span className="text-zinc-400 block text-[10px] font-mono">STATUTORY MSME PRIVILEGE:</span>
-                    <span className="font-bold text-emerald-400 block mt-1 font-mono">100% EMD Waived</span>
+                    <span className="font-bold text-emerald-400 block mt-1 font-mono">₹0 EMD (100% Waived)</span>
                     <span className="text-[11px] text-zinc-400 font-mono block mt-0.5">GFR 2017 Rule 170(i)</span>
                   </div>
                 </div>
               </div>
 
-              {/* Recommendations & Statutory Guidance */}
-              <div className="bg-[#13161a] border border-[#222730] rounded-xl p-5 space-y-3">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-300 font-mono">
-                  Recommended Bidding Strategy
-                </h4>
-                <ul className="space-y-2">
-                  {evaluation.recommendations.map((rec, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-300 leading-relaxed">
-                      <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 font-bold font-mono text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
-                        {i + 1}
-                      </span>
-                      <span>{rec}</span>
-                    </li>
-                  ))}
+              {/* Recommendations & Practical High-Yield Bidding Strategy */}
+              <div className="bg-[#13161a] border border-[#222730] rounded-xl p-5 space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-emerald-400 font-mono flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    High-Value Strategic Bidding Recommendations
+                  </h4>
+                  <Badge variant="success" className="text-[10px] font-mono">
+                    ISRO GCC & MSME Aligned
+                  </Badge>
+                </div>
+
+                <ul className="space-y-2.5">
+                  <li className="flex items-start gap-2.5 text-xs text-zinc-200 leading-relaxed p-2.5 rounded-xl bg-[#0a0b0e] border border-[#1e232b]">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold font-mono text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
+                      1
+                    </span>
+                    <div>
+                      <strong className="text-white block font-sans">Zero-Cash EMD Working Capital Protection:</strong>
+                      <span>Attach your valid Udyam Registration certificate in Technical Envelope-1 under GFR 2017 Rule 170(i) to preserve ₹6.40 Lakhs liquidity with ₹0 deposit.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-2.5 text-xs text-zinc-200 leading-relaxed p-2.5 rounded-xl bg-[#0a0b0e] border border-[#1e232b]">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold font-mono text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
+                      2
+                    </span>
+                    <div>
+                      <strong className="text-white block font-sans">L1 + 15% MSE Price-Matching Band Leverage:</strong>
+                      <span>Under Indian Public Procurement Policy, if your commercial bid falls within 15% of the lowest quote (L1), you are entitled to match L1 and secure 25% of the total contract volume.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-2.5 text-xs text-zinc-200 leading-relaxed p-2.5 rounded-xl bg-[#0a0b0e] border border-[#1e232b]">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold font-mono text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
+                      3
+                    </span>
+                    <div>
+                      <strong className="text-white block font-sans">Raw Material Spot Price Inflation Hedge (+4.5%):</strong>
+                      <span>Structure your Envelope-2 financial quote based on the current Titanium benchmark (₹3,369/kg) with a 4.5% escalation buffer to safeguard margins across the 6-month delivery cycle.</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-2.5 text-xs text-zinc-200 leading-relaxed p-2.5 rounded-xl bg-[#0a0b0e] border border-[#1e232b]">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold font-mono text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
+                      4
+                    </span>
+                    <div>
+                      <strong className="text-white block font-sans">14-Day Pre-Dispatch Inspection (PDI) Buffer:</strong>
+                      <span>Schedule third-party NABL metrology and CMM 3D sign-off 14 days before delivery to prevent ISRO GCC Clause 14.2 Liquidated Damages (0.5% per week delay penalty).</span>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-2.5 text-xs text-zinc-200 leading-relaxed p-2.5 rounded-xl bg-[#0a0b0e] border border-[#1e232b]">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold font-mono text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/30">
+                      5
+                    </span>
+                    <div>
+                      <strong className="text-white block font-sans">ISO Class 7 Cleanroom Nitrogen-Purge Packaging:</strong>
+                      <span>Vacuum-seal finished hardware in dual antistatic polyethylene bags with dry nitrogen purge to eliminate orbital outgassing risks and pass stores receiving inspection.</span>
+                    </div>
+                  </li>
                 </ul>
               </div>
             </div>

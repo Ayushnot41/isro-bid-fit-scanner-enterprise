@@ -1,10 +1,13 @@
 "use client";
 
-import { useUser, UserButton } from "@clerk/nextjs";
-import { Bell, Search } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "@/components/auth/auth-provider";
+import { Bell, Search, Radio, Shield, Sparkles } from "lucide-react";
+import { NotificationsModal } from "./notifications-modal";
 
 export function Header() {
-  const { user } = useUser();
+  const { user } = useAuth();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   return (
     <header className="h-16 border-b border-[#222730] bg-[#0d0f12]/90 backdrop-blur-md flex items-center justify-between px-6 sm:px-8 sticky top-0 z-30">
@@ -34,24 +37,26 @@ export function Header() {
 
         <button
           aria-label="Notifications"
+          onClick={() => setShowNotifications(true)}
           className="relative p-2 text-zinc-400 hover:text-white hover:bg-[#181c22] rounded-xl transition-all border border-transparent hover:border-[#222730]"
         >
           <Bell className="w-4 h-4" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-[#0d0f12]" />
         </button>
 
+        {/* Live Notifications Center Modal */}
+        <NotificationsModal
+          isOpen={showNotifications}
+          onClose={() => setShowNotifications(false)}
+        />
+
         <div className="flex items-center gap-2.5 pl-2 border-l border-[#222730]">
-          <UserButton
-            afterSignOutUrl="/login"
-            appearance={{
-              elements: {
-                avatarBox: "w-8 h-8 rounded-xl",
-              },
-            }}
-          />
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-xs shadow-sm">
+            {user?.email?.charAt(0).toUpperCase() || "V"}
+          </div>
           <div className="hidden sm:block text-left">
             <p className="text-xs font-semibold text-white leading-none">
-              {user?.fullName || user?.primaryEmailAddress?.emailAddress?.split("@")[0] || "AeroPrecision India"}
+              {user?.email ? user.email.split("@")[0] : "AeroPrecision India"}
             </p>
             <p className="text-[10px] font-mono text-zinc-500 leading-tight mt-0.5">
               Verified Aerospace MSME
@@ -62,4 +67,3 @@ export function Header() {
     </header>
   );
 }
-

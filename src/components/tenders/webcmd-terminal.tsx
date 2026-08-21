@@ -164,7 +164,7 @@ export function WebCmdTerminal({ isOpen, onClose, onScrapeSuccess }: WebCmdTermi
           addLog("success", `✓ Extractor Agent: ${data.extractor_agent?.materials_analysis?.alloy_grade || "Ti-6Al-4V Grade 5"}`);
           addLog("telemetry", `• Strength of Materials: Yield ${data.extractor_agent?.materials_analysis?.yield_strength_mpa?.offered} MPa (100% Compliant) | Tol: ±5 µm`);
           addLog("telemetry", `• Statutory MSME: ₹${((data.extractor_agent?.msme_statutory_waivers?.emd_savings_inr || 640000) / 100000).toFixed(2)} Lakhs EMD Exemption (GFR 170(i))`);
-          addLog("telemetry", `• Predictor Agent: Win Probability = ${data.predictor_agent?.bid_win_probability_score}% | Commodity Index: ${data.predictor_agent?.commodity_pricing?.material_index}`);
+          addLog("telemetry", `• Predictor Agent: Win Probability = ${data.predictor_agent?.bid_win_probability_score}% | Ti-64 Spot: ₹3,369 / kg (INR)`);
           addLog("success", `✓ pgvector Memory: 1536-dim embedding cosine match = ${data.predictor_agent?.historical_vector_similarity_match}`);
         }
       } catch {

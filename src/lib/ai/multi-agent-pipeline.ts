@@ -206,7 +206,7 @@ Return a strictly valid JSON with this schema:
       commercial_deviation_risk: "LOW",
       historical_vector_similarity_match: 0.94,
       autonomous_risk_flags: [],
-      strategic_bid_rationale: `Extractor Agent confirmed 100% Strength of Materials compliance (${alloy} Yield: ${offYield} MPa vs ${reqYield} MPa mandated). Predictor Agent cross-referenced global commodity indices (${spotPriceUsd} USD/kg) and verified ₹${(emdSavings / 100000).toFixed(2)}L MSME EMD waiver under GFR 170(i). Final Bid Win Probability is 95%.`,
+      strategic_bid_rationale: `Extractor Agent confirmed 100% Strength of Materials compliance (${alloy} Yield: ${offYield} MPa vs ${reqYield} MPa mandated). Predictor Agent cross-referenced commodity spot pricing (₹${inrPerKg.toLocaleString("en-IN")}/kg) and verified ₹${(emdSavings / 100000).toFixed(2)}L MSME EMD waiver under GFR 170(i). Final Bid Win Probability is 95%.`,
     },
     timestamp: new Date().toISOString(),
   };
