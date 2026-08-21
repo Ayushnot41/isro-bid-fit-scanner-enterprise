@@ -6,8 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { BidEvaluation, ScrapedTender } from "@/lib/types/database";
 import { ScoreGauge } from "@/components/ui/score-gauge";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
-import { Zap, Radio, ChevronRight, Sparkles } from "lucide-react";
+import { Radio, ChevronRight, Zap } from "lucide-react";
 import { AiEvaluationModal } from "@/components/tenders/ai-evaluation-modal";
 import { INITIAL_SCRAPED_TENDERS } from "@/lib/mock-data";
 
@@ -58,7 +57,6 @@ export function RealtimeFeed({ initialEvaluations }: RealtimeFeedProps) {
   }, [supabase]);
 
   const handleOpenDossier = (evaluation: BidEvaluation) => {
-    // Match against scraped tenders or generate fallback
     const matchedTender =
       INITIAL_SCRAPED_TENDERS.find((t) => t.id === evaluation.tender_id) ||
       INITIAL_SCRAPED_TENDERS.find((t) => t.reference_number === evaluation.tender_reference) ||
@@ -70,16 +68,16 @@ export function RealtimeFeed({ initialEvaluations }: RealtimeFeedProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between p-3 bg-zinc-900/60 border border-zinc-800/80 rounded-2xl">
+    <div className="space-y-3.5">
+      <div className="flex items-center justify-between p-3 bg-[#0d0f12] border border-[#222730] rounded-xl">
         <div className="flex items-center gap-2">
-          <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
-            Realtime Bid-Fit Pipeline
+          <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300 font-mono">
+            Live Telemetry Stream
           </span>
         </div>
-        <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-          Supabase WebSocket: ACTIVE
+        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+          WebSocket: ACTIVE
         </span>
       </div>
 
@@ -88,48 +86,48 @@ export function RealtimeFeed({ initialEvaluations }: RealtimeFeedProps) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-12 bg-zinc-900/40 border border-zinc-800/60 rounded-2xl text-zinc-500"
+            className="text-center py-12 bg-[#13161a] border border-[#222730] rounded-2xl text-zinc-500"
           >
-            <Zap className="w-8 h-8 mx-auto mb-3 opacity-40 text-emerald-400" />
-            <p className="text-sm font-medium">No evaluations streaming currently.</p>
-            <p className="text-xs text-zinc-600 mt-1">
+            <Zap className="w-7 h-7 mx-auto mb-2.5 opacity-40 text-emerald-400" />
+            <p className="text-xs font-medium">No evaluations streaming currently.</p>
+            <p className="text-[11px] text-zinc-500 mt-0.5">
               Select any ISRO tender to trigger an instant AI scan.
             </p>
           </motion.div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {evaluations.slice(0, 8).map((evaluation, index) => {
               const isNew = newIds.has(evaluation.id);
 
               return (
                 <motion.div
                   key={evaluation.id}
-                  initial={{ opacity: 0, y: 20, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
                   transition={{
-                    duration: 0.4,
-                    delay: index * 0.04,
-                    ease: [0.22, 1, 0.36, 1],
+                    duration: 0.35,
+                    delay: index * 0.03,
+                    ease: [0.16, 1, 0.3, 1],
                   }}
                   layout
                   onClick={() => handleOpenDossier(evaluation)}
-                  className={`cursor-pointer bg-zinc-900/80 hover:bg-zinc-900 border rounded-2xl p-4 transition-all hover:border-zinc-700 ${
+                  className={`cursor-pointer bg-[#13161a] hover:bg-[#181c22] border rounded-xl p-3.5 transition-all ${
                     isNew
-                      ? "border-emerald-500/50 shadow-lg shadow-emerald-500/10"
-                      : "border-zinc-800"
+                      ? "border-emerald-500/50 shadow-md shadow-emerald-500/10"
+                      : "border-[#222730] hover:border-[#303744]"
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-mono text-xs font-semibold text-emerald-400">
                           {evaluation.tender_reference}
                         </span>
-                        {isNew && <Badge variant="success">LIVE UPDATE</Badge>}
+                        {isNew && <Badge variant="success">NEW</Badge>}
                       </div>
 
-                      <h4 className="text-xs sm:text-sm font-semibold text-white truncate mb-2">
+                      <h4 className="text-xs font-semibold text-white truncate mb-1.5">
                         {evaluation.tender_title || "ISRO Tender Evaluation"}
                       </h4>
 
@@ -153,8 +151,8 @@ export function RealtimeFeed({ initialEvaluations }: RealtimeFeedProps) {
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <ScoreGauge score={evaluation.final_bid_fit_score} size={60} strokeWidth={5} />
-                      <ChevronRight className="w-4 h-4 text-zinc-600 hidden sm:block" />
+                      <ScoreGauge score={evaluation.final_bid_fit_score} size={54} strokeWidth={4.5} />
+                      <ChevronRight className="w-3.5 h-3.5 text-zinc-600 hidden sm:block" />
                     </div>
                   </div>
                 </motion.div>

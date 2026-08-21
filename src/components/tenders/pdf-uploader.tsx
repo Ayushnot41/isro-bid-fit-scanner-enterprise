@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   UploadCloud,
   FileText,
@@ -93,13 +93,15 @@ export function PdfUploader({ onTenderParsed }: PdfUploaderProps) {
   };
 
   return (
-    <div className="bg-zinc-900/95 border border-zinc-800 rounded-2xl p-5 space-y-4 shadow-xl">
+    <div className="bg-[#13161a] border border-[#222730] rounded-2xl p-5 space-y-4 shadow-xl">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <UploadCloud className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-sm font-bold text-white">Manual ISRO RFP / PDF Ingestion</h3>
+          <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono">
+            Manual ISRO RFP / PDF Ingestion
+          </h3>
         </div>
-        <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
+        <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/25 font-bold">
           AI OCR & GD&T EXTRACTOR
         </span>
       </div>
@@ -111,7 +113,7 @@ export function PdfUploader({ onTenderParsed }: PdfUploaderProps) {
         className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${
           isDragging
             ? "border-emerald-500 bg-emerald-500/10"
-            : "border-zinc-800 bg-zinc-950/70 hover:border-zinc-700"
+            : "border-[#222730] bg-[#0a0b0e] hover:border-[#303744]"
         }`}
       >
         <input
@@ -124,14 +126,14 @@ export function PdfUploader({ onTenderParsed }: PdfUploaderProps) {
 
         {file ? (
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800 text-xs text-white border border-zinc-700 font-mono">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#181c22] text-xs text-white border border-[#222730] font-mono">
               <FileText className="w-4 h-4 text-emerald-400" />
-              {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+              <span>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
             </div>
 
             {parsing ? (
               <div className="space-y-2 max-w-xs mx-auto">
-                <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[#181c22] rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full"
                     style={{ width: `${progress}%` }}
@@ -140,15 +142,15 @@ export function PdfUploader({ onTenderParsed }: PdfUploaderProps) {
                 </div>
                 <p className="text-[11px] font-mono text-emerald-400 flex items-center justify-center gap-1.5">
                   <Loader2 className="w-3 h-3 animate-spin" />
-                  {statusText}
+                  <span>{statusText}</span>
                 </p>
               </div>
             ) : parsedResult ? (
               <div className="space-y-3 text-left">
-                <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs space-y-1">
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl text-xs space-y-1">
                   <p className="font-semibold text-emerald-300 flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    AI Specification Extraction Complete
+                    <span>AI Specification Extraction Complete</span>
                   </p>
                   <p className="text-zinc-400 font-mono text-[11px]">
                     Reference: {parsedResult.reference_number} • Target Value: ₹4.50 Cr
@@ -157,34 +159,34 @@ export function PdfUploader({ onTenderParsed }: PdfUploaderProps) {
 
                 {/* Aerospace Telemetry Spec Extraction Diagram */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
-                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] mb-1">
+                  <div className="p-2.5 rounded-lg bg-[#0a0b0e] border border-[#222730]">
+                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] mb-1 font-mono">
                       <Cpu className="w-3 h-3 text-cyan-400" />
-                      MATERIAL
+                      <span>MATERIAL</span>
                     </div>
                     <span className="font-mono text-white text-[11px] font-bold">Ti-6Al-4V Gr.5</span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
-                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] mb-1">
+                  <div className="p-2.5 rounded-lg bg-[#0a0b0e] border border-[#222730]">
+                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] mb-1 font-mono">
                       <Wrench className="w-3 h-3 text-emerald-400" />
-                      GD&T TOLERANCE
+                      <span>GD&T TOLERANCE</span>
                     </div>
                     <span className="font-mono text-emerald-400 text-[11px] font-bold">±5 µm Linear</span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
-                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] mb-1">
+                  <div className="p-2.5 rounded-lg bg-[#0a0b0e] border border-[#222730]">
+                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] mb-1 font-mono">
                       <Layers className="w-3 h-3 text-purple-400" />
-                      CLEANROOM
+                      <span>CLEANROOM</span>
                     </div>
                     <span className="font-mono text-purple-300 text-[11px] font-bold">ISO 7 (10k)</span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
-                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] mb-1">
+                  <div className="p-2.5 rounded-lg bg-[#0a0b0e] border border-[#222730]">
+                    <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] mb-1 font-mono">
                       <ShieldAlert className="w-3 h-3 text-amber-400" />
-                      QUALITY AUDIT
+                      <span>QUALITY AUDIT</span>
                     </div>
                     <span className="font-mono text-amber-300 text-[11px] font-bold">AS9100D</span>
                   </div>
@@ -192,9 +194,9 @@ export function PdfUploader({ onTenderParsed }: PdfUploaderProps) {
               </div>
             ) : (
               <div>
-                <Button variant="primary" size="sm" onClick={startExtraction} className="flex items-center gap-2 mx-auto">
+                <Button variant="primary" size="sm" onClick={startExtraction} className="flex items-center gap-2 mx-auto text-xs">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Extract & Run Bid-Fit Evaluation
+                  <span>Extract & Run Bid-Fit Evaluation</span>
                 </Button>
               </div>
             )}

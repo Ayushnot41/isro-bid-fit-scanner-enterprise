@@ -1,15 +1,25 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { AuthProvider } from "@/components/auth/auth-provider";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "ISRO Bid-Fit Scanner | Enterprise Tender Evaluation",
+  title: "ISRO Bid-Fit Scanner Enterprise | Autonomous Procurement Intelligence",
   description:
-    "Evaluate ISRO tenders against your vendor profile. Secure, multi-tenant SaaS platform.",
+    "Autonomous E-Procurement Intelligence, GD&T Tolerance Engine and Statutory MSME Compliance Platform for ISRO Tenders.",
 };
 
 export default function RootLayout({
@@ -18,8 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="font-sans bg-[#08090a] text-zinc-100 antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
