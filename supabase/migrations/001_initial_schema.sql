@@ -1,12 +1,58 @@
 -- ============================================================
 -- ISRO Bid-Fit Scanner Enterprise — Initial Schema Migration
 -- ============================================================
--- Tables: vendor_profiles, bid_evaluations, scraped_tenders
--- All tables enforce Row Level Security with auth.uid() isolation
+-- IMPORTANT: Table creation ORDER matters for FK constraints.
+-- 1. scraped_tenders  (no FK dependencies)
+-- 2. vendor_profiles  (references auth.users only)
+-- 3. bid_evaluations  (references auth.users + scraped_tenders)
 -- ============================================================
 
+
 -- =========================
--- 1. vendor_profiles
+-- 1. scraped_tenders
+-- =========================
+CREATE TABLE IF NOT EXISTS public.scraped_tenders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  reference_number TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  issuing_center TEXT,
+  center_code TEXT,
+  closing_date TIMESTAMPTZ,
+  opening_date TIMESTAMPTZ,
+  estimated_value_inr BIGINT,
+  emd_amount_inr BIGINT,
+  category TEXT,
+  required_certifications TEXT[] DEFAULT '{}',
+  required_tolerances JSONB DEFAULT '{}'::jsonb,
+  minimum_turnover_inr BIGINT,
+  required_capabilities TEXT[] DEFAULT '{}',
+  source_url TEXT,
+  pdf_storage_path TEXT,
+  raw_metadata JSONB DEFAULT '{}'::jsonb,
+  is_active BOOLEAN DEFAULT true,
+  scraped_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_scraped_tenders_reference ON public.scraped_tenders(reference_number);
+CREATE INDEX IF NOT EXISTS idx_scraped_tenders_closing   ON public.scraped_tenders(closing_date DESC);
+CREATE INDEX IF NOT EXISTS idx_scraped_tenders_active    ON public.scraped_tenders(is_active);
+
+-- Enable RLS
+ALTER TABLE public.scraped_tenders ENABLE ROW LEVEL SECURITY;
+
+-- Policies: read-only for authenticated users, writes via service_role only
+CREATE POLICY "Authenticated users can view tenders"
+  ON public.scraped_tenders FOR SELECT
+  TO authenticated
+  USING (true);
+
+-- Note: INSERT/UPDATE/DELETE restricted to service_role (WebCMD scraper bypasses RLS)
+
+
+-- =========================
+-- 2. vendor_profiles
 -- =========================
 CREATE TABLE IF NOT EXISTS public.vendor_profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -62,8 +108,9 @@ CREATE POLICY "Users can delete own profile"
 
 
 -- =========================
--- 2. bid_evaluations
+-- 3. bid_evaluations
 -- =========================
+-- (scraped_tenders must exist first for the FK to work)
 CREATE TABLE IF NOT EXISTS public.bid_evaluations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -71,6 +118,7 @@ CREATE TABLE IF NOT EXISTS public.bid_evaluations (
   tender_reference TEXT NOT NULL,
   tender_title TEXT,
   tender_source_url TEXT,
+  issuing_center TEXT,
   tender_mechanical_tolerances_met BOOLEAN DEFAULT false,
   missing_certifications TEXT[] DEFAULT '{}',
   msme_waivers_applied TEXT[] DEFAULT '{}',
@@ -88,8 +136,9 @@ CREATE TABLE IF NOT EXISTS public.bid_evaluations (
 );
 
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_bid_evaluations_user_id ON public.bid_evaluations(user_id);
+CREATE INDEX IF NOT EXISTS idx_bid_evaluations_user_id      ON public.bid_evaluations(user_id);
 CREATE INDEX IF NOT EXISTS idx_bid_evaluations_evaluated_at ON public.bid_evaluations(evaluated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_bid_evaluations_score        ON public.bid_evaluations(final_bid_fit_score DESC);
 
 -- Enable RLS
 ALTER TABLE public.bid_evaluations ENABLE ROW LEVEL SECURITY;
@@ -118,53 +167,9 @@ CREATE POLICY "Users can delete own evaluations"
 
 
 -- =========================
--- 3. scraped_tenders
--- =========================
-CREATE TABLE IF NOT EXISTS public.scraped_tenders (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  reference_number TEXT UNIQUE NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
-  issuing_center TEXT,
-  closing_date TIMESTAMPTZ,
-  opening_date TIMESTAMPTZ,
-  estimated_value_inr BIGINT,
-  emd_amount_inr BIGINT,
-  category TEXT,
-  required_certifications TEXT[] DEFAULT '{}',
-  required_tolerances JSONB DEFAULT '{}'::jsonb,
-  minimum_turnover_inr BIGINT,
-  required_capabilities TEXT[] DEFAULT '{}',
-  source_url TEXT,
-  pdf_storage_path TEXT,
-  raw_metadata JSONB DEFAULT '{}'::jsonb,
-  is_active BOOLEAN DEFAULT true,
-  scraped_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_scraped_tenders_reference ON public.scraped_tenders(reference_number);
-CREATE INDEX IF NOT EXISTS idx_scraped_tenders_closing ON public.scraped_tenders(closing_date DESC);
-CREATE INDEX IF NOT EXISTS idx_scraped_tenders_active ON public.scraped_tenders(is_active);
-
--- Enable RLS
-ALTER TABLE public.scraped_tenders ENABLE ROW LEVEL SECURITY;
-
--- Policies: read-only for all authenticated users, writes via service_role only
-CREATE POLICY "Authenticated users can view tenders"
-  ON public.scraped_tenders FOR SELECT
-  TO authenticated
-  USING (true);
-
--- Note: INSERT/UPDATE/DELETE on scraped_tenders is restricted to service_role
--- (no authenticated user policies for writes — the server-side scraper uses
--- the service_role key which bypasses RLS entirely)
-
-
--- =========================
 -- 4. Realtime publication
 -- =========================
--- Enable Realtime on bid_evaluations so dashboards get live updates
+-- Enable Realtime on bid_evaluations so dashboards get live push updates
 ALTER PUBLICATION supabase_realtime ADD TABLE public.bid_evaluations;
 
 

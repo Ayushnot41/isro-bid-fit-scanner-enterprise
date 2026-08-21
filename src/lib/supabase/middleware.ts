@@ -11,8 +11,17 @@ export async function updateSession(request: NextRequest) {
   let user = null;
 
   try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://your-project.supabase.co";
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy";
+    const url =
+      process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      process.env.SUPABASE_URL ||
+      "https://fquacmockdeqnxagequt.supabase.co";
+
+    const key =
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+      process.env.SUPABASE_PUBLISHABLE_KEY ||
+      process.env.SUPABASE_ANON_KEY ||
+      "sb_publishable_KbH_B_0fNSAl0VLlCaGzfQ_Vo7kSXBQ";
 
     const supabase = createServerClient(url, key, {
       cookies: {

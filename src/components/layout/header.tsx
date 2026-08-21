@@ -1,10 +1,10 @@
 "use client";
 
-import { useAuth } from "@/components/auth/auth-provider";
-import { Bell, Search, Radio, Shield, Sparkles } from "lucide-react";
+import { useUser, UserButton } from "@clerk/nextjs";
+import { Bell, Search } from "lucide-react";
 
 export function Header() {
-  const { user } = useAuth();
+  const { user } = useUser();
 
   return (
     <header className="h-16 border-b border-[#222730] bg-[#0d0f12]/90 backdrop-blur-md flex items-center justify-between px-6 sm:px-8 sticky top-0 z-30">
@@ -41,12 +41,17 @@ export function Header() {
         </button>
 
         <div className="flex items-center gap-2.5 pl-2 border-l border-[#222730]">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-xs shadow-sm">
-            {user?.email?.charAt(0).toUpperCase() || "V"}
-          </div>
+          <UserButton
+            afterSignOutUrl="/login"
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8 rounded-xl",
+              },
+            }}
+          />
           <div className="hidden sm:block text-left">
             <p className="text-xs font-semibold text-white leading-none">
-              {user?.email ? user.email.split("@")[0] : "AeroPrecision India"}
+              {user?.fullName || user?.primaryEmailAddress?.emailAddress?.split("@")[0] || "AeroPrecision India"}
             </p>
             <p className="text-[10px] font-mono text-zinc-500 leading-tight mt-0.5">
               Verified Aerospace MSME
@@ -57,3 +62,4 @@ export function Header() {
     </header>
   );
 }
+

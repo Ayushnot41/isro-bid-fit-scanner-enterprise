@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { BidEvaluation, ScrapedTender } from "@/lib/types/database";
 import { ScoreGauge } from "@/components/ui/score-gauge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
-import { Search, ChevronRight, FileText, Download } from "lucide-react";
+import { Search, ChevronRight, FileText, Download, Trash2, Loader2, RefreshCw } from "lucide-react";
 import { AiEvaluationModal } from "@/components/tenders/ai-evaluation-modal";
 import { INITIAL_SCRAPED_TENDERS } from "@/lib/mock-data";
 
@@ -19,6 +19,8 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
   const [evaluations, setEvaluations] = useState<BidEvaluation[]>(initialEvaluations);
   const [searchQuery, setSearchQuery] = useState("");
   const [scoreFilter, setScoreFilter] = useState<"ALL" | "HIGH" | "MODERATE" | "LOW">("ALL");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Modal State
   const [selectedEval, setSelectedEval] = useState<BidEvaluation | null>(null);
@@ -54,22 +56,40 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
     setIsModalOpen(true);
   };
 
+  const handleDeleteDossier = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDeletingId(id);
+
+    try {
+      await fetch(`/api/evaluations/${id}`, { method: "DELETE" });
+      setEvaluations((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error("Delete error:", err);
+      setEvaluations((prev) => prev.filter((item) => item.id !== id));
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const res = await fetch("/api/evaluations");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.evaluations) {
+          setEvaluations(data.evaluations);
+        }
+      }
+    } catch (err) {
+      console.error("Refresh error:", err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const handleExportCSV = () => {
-    const headers = "Reference,Title,FitScore,CertScore,ToleranceMet,MSMEWaivers,EvaluatedAt\n";
-    const rows = evaluations
-      .map(
-        (e) =>
-          `"${e.tender_reference}","${e.tender_title || ""}",${e.final_bid_fit_score},${e.certification_score},${e.tender_mechanical_tolerances_met},"${e.msme_waivers_applied.join("; ")}",${e.evaluated_at}`
-      )
-      .join("\n");
-    const blob = new Blob([headers + rows], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `isro_evaluations_vault_${Date.now()}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    window.location.href = "/api/evaluations/export";
   };
 
   return (
@@ -88,15 +108,28 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
             />
           </div>
 
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleExportCSV}
-            className="w-full sm:w-auto text-xs flex items-center gap-1.5"
-          >
-            <Download className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Export Vault (CSV)</span>
-          </Button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="text-xs flex items-center gap-1.5"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${refreshing ? "animate-spin" : ""}`} />
+              <span>Refresh</span>
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleExportCSV}
+              className="w-full sm:w-auto text-xs flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Export Vault (CSV)</span>
+            </Button>
+          </div>
         </div>
 
         {/* Score Filter Pills */}
@@ -128,74 +161,94 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
         </div>
       </div>
 
-      {/* Dossiers Grid */}
+      {/* Dossiers Grid with AnimatePresence */}
       {filteredEvals.length === 0 ? (
         <div className="text-center py-16 bg-[#13161a] border border-[#222730] rounded-2xl text-zinc-500">
           <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm font-medium">No evaluation dossiers match your criteria.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredEvals.map((evaluation, index) => (
-            <motion.div
-              key={evaluation.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.03, ease: [0.16, 1, 0.3, 1] }}
-              onClick={() => handleOpenDossier(evaluation)}
-              className="bg-[#13161a] hover:bg-[#161a20] border border-[#222730] hover:border-[#303744] rounded-2xl p-5 transition-all cursor-pointer group shadow-md flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-3 mb-2">
-                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
-                    {evaluation.tender_reference}
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AnimatePresence mode="popLayout">
+            {filteredEvals.map((evaluation) => (
+              <motion.div
+                key={evaluation.id}
+                layout
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                onClick={() => handleOpenDossier(evaluation)}
+                className="bg-[#13161a] hover:bg-[#161a20] border border-[#222730] hover:border-[#303744] rounded-2xl p-5 transition-all cursor-pointer group shadow-md flex flex-col justify-between relative"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
+                      {evaluation.tender_reference}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          evaluation.final_bid_fit_score >= 75
+                            ? "success"
+                            : evaluation.final_bid_fit_score >= 50
+                            ? "warning"
+                            : "danger"
+                        }
+                      >
+                        {Math.round(evaluation.final_bid_fit_score)}% Match
+                      </Badge>
+
+                      <button
+                        type="button"
+                        aria-label="Delete dossier"
+                        onClick={(e) => handleDeleteDossier(e, evaluation.id)}
+                        disabled={deletingId === evaluation.id}
+                        className="p-1 text-zinc-500 hover:text-red-400 hover:bg-[#181c22] rounded-lg transition-colors"
+                      >
+                        {deletingId === evaluation.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <h3 className="text-sm font-semibold text-white group-hover:text-emerald-300 transition-colors line-clamp-2 mb-3">
+                    {evaluation.tender_title || "ISRO Tender Specification Evaluation"}
+                  </h3>
+
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {evaluation.tender_mechanical_tolerances_met ? (
+                      <Badge variant="success">Tolerances Met</Badge>
+                    ) : (
+                      <Badge variant="danger">Tolerance Gap</Badge>
+                    )}
+                    {evaluation.missing_certifications.length === 0 ? (
+                      <Badge variant="success">Certs Compliant</Badge>
+                    ) : (
+                      <Badge variant="warning">{evaluation.missing_certifications.length} Cert Gaps</Badge>
+                    )}
+                    {evaluation.msme_waivers_applied.length > 0 && (
+                      <Badge variant="info">MSME EMD Waived</Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-[#222730] text-xs">
+                  <span className="text-zinc-500 font-mono text-[11px]">
+                    {formatDate(evaluation.evaluated_at)}
                   </span>
-                  <Badge
-                    variant={
-                      evaluation.final_bid_fit_score >= 75
-                        ? "success"
-                        : evaluation.final_bid_fit_score >= 50
-                        ? "warning"
-                        : "danger"
-                    }
-                  >
-                    {Math.round(evaluation.final_bid_fit_score)}% Match
-                  </Badge>
+                  <span className="text-emerald-400 font-semibold text-xs flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>Inspect Full Dossier</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
                 </div>
-
-                <h3 className="text-sm font-semibold text-white group-hover:text-emerald-300 transition-colors line-clamp-2 mb-3">
-                  {evaluation.tender_title || "ISRO Tender Specification Evaluation"}
-                </h3>
-
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {evaluation.tender_mechanical_tolerances_met ? (
-                    <Badge variant="success">Tolerances Met</Badge>
-                  ) : (
-                    <Badge variant="danger">Tolerance Gap</Badge>
-                  )}
-                  {evaluation.missing_certifications.length === 0 ? (
-                    <Badge variant="success">Certs Compliant</Badge>
-                  ) : (
-                    <Badge variant="warning">{evaluation.missing_certifications.length} Cert Gaps</Badge>
-                  )}
-                  {evaluation.msme_waivers_applied.length > 0 && (
-                    <Badge variant="info">MSME EMD Waived</Badge>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-3 border-t border-[#222730] text-xs">
-                <span className="text-zinc-500 font-mono text-[11px]">
-                  {formatDate(evaluation.evaluated_at)}
-                </span>
-                <span className="text-emerald-400 font-semibold text-xs flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                  <span>Inspect Full Dossier</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       {/* Detail Modal */}
