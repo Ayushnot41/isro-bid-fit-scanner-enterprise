@@ -1,50 +1,8 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-// Routes that require authentication
-const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)",
-  "/tenders(.*)",
-  "/evaluations(.*)",
-  "/competitors(.*)",
-  "/profile(.*)",
-]);
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-// Routes for auth pages
-const isAuthRoute = createRouteMatcher(["/login(.*)", "/register(.*)"]);
-
-const hasClerkKeys =
-  Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
-  Boolean(process.env.CLERK_SECRET_KEY) &&
-  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes("dummy");
-
-export default function middleware(req: any, event: any) {
-  if (hasClerkKeys) {
-    try {
-      return clerkMiddleware((auth, req) => {
-        const { userId } = auth();
-
-        // Redirect unauthenticated users away from protected routes
-        if (isProtectedRoute(req) && !userId) {
-          const signInUrl = new URL("/login", req.url);
-          signInUrl.searchParams.set("redirect_url", req.url);
-          return NextResponse.redirect(signInUrl);
-        }
-
-        // Redirect authenticated users away from login/register
-        if (isAuthRoute(req) && userId) {
-          return NextResponse.redirect(new URL("/dashboard", req.url));
-        }
-
-        return NextResponse.next();
-      })(req, event);
-    } catch {
-      return NextResponse.next();
-    }
-  }
-
-  // Graceful fallback if Clerk keys are not set in environment
-  const pathname = req.nextUrl?.pathname || "";
   const isProtected = [
     "/dashboard",
     "/tenders",
@@ -57,15 +15,24 @@ export default function middleware(req: any, event: any) {
     pathname.startsWith(path)
   );
 
-  const demoSession = req.cookies?.get("demo_session")?.value;
+  // Check for Clerk session token, Supabase token, or demo session cookie
+  const clerkToken =
+    req.cookies.get("__session")?.value ||
+    req.cookies.get("__client_uat")?.value;
+  const demoSession = req.cookies.get("demo_session")?.value;
+  const supabaseToken = req.cookies.get("sb-access-token")?.value;
 
-  if (isProtected && !demoSession) {
+  const isAuthenticated = Boolean(clerkToken || demoSession || supabaseToken);
+
+  // Redirect unauthenticated visitors trying to access protected dashboards
+  if (isProtected && !isAuthenticated) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect_url", req.url);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuth && demoSession) {
+  // Redirect authenticated users away from /login or /register
+  if (isAuth && isAuthenticated) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
