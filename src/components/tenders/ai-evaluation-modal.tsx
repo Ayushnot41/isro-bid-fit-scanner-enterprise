@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import type { BidEvaluation, ScrapedTender } from "@/lib/types/database";
 import { ScoreGauge } from "@/components/ui/score-gauge";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +56,9 @@ export function AiEvaluationModal({
   const [showConsortium, setShowConsortium] = useState(false);
   const [showDsc, setShowDsc] = useState(false);
 
+  // Lock background scroll when modal is open
+  useLockBodyScroll(isOpen);
+
   if (!tender || !evaluation) return null;
 
   const handleDownloadDossier = () => {
@@ -64,7 +68,7 @@ export function AiEvaluationModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto selection:bg-emerald-500/30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden selection:bg-emerald-500/30">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -76,14 +80,14 @@ export function AiEvaluationModal({
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-5xl max-h-[92vh] bg-[#0e1115] border border-[#222730] rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden z-10"
           >
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 border-b border-[#222730] bg-[#13161a]">
+            <div className="p-5 sm:p-6 border-b border-[#222730] bg-[#13161a] flex-shrink-0">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 pr-2">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -430,7 +434,7 @@ export function AiEvaluationModal({
             </div>
 
             {/* Modal Footer with Direct PDF Download & Print */}
-            <div className="p-4 border-t border-[#222730] bg-[#13161a] flex flex-wrap items-center justify-between gap-3">
+            <div className="flex-shrink-0 p-4 border-t border-[#222730] bg-[#13161a] flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleDownloadDossier}
