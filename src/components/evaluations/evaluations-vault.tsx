@@ -7,7 +7,7 @@ import { ScoreGauge } from "@/components/ui/score-gauge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
-import { Search, ChevronRight, FileText, Download, Trash2, Loader2, RefreshCw } from "lucide-react";
+import { Search, ChevronRight, FileText, Download, Trash2, Loader2, RefreshCw, Sparkles, Filter } from "lucide-react";
 import { AiEvaluationModal } from "@/components/tenders/ai-evaluation-modal";
 import { INITIAL_SCRAPED_TENDERS } from "@/lib/mock-data";
 
@@ -101,9 +101,9 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <input
               type="text"
+              placeholder="Search dossiers by tender title, reference, or ISRO center..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search evaluated dossiers by tender title, center, or RFP code..."
               className="w-full pl-10 pr-4 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50 transition-all font-sans"
             />
           </div>
@@ -114,9 +114,9 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
               size="sm"
               onClick={handleRefresh}
               disabled={refreshing}
-              className="text-xs flex items-center gap-1.5"
+              className="w-full sm:w-auto text-xs flex items-center gap-1.5 font-mono"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-zinc-400 ${refreshing ? "animate-spin" : ""}`} />
               <span>Refresh</span>
             </Button>
 
@@ -124,7 +124,7 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
               variant="secondary"
               size="sm"
               onClick={handleExportCSV}
-              className="w-full sm:w-auto text-xs flex items-center gap-1.5"
+              className="w-full sm:w-auto text-xs flex items-center gap-1.5 font-mono"
             >
               <Download className="w-3.5 h-3.5 text-emerald-400" />
               <span>Export Vault (CSV)</span>
@@ -133,8 +133,11 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
         </div>
 
         {/* Score Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-xs text-zinc-500 font-mono mr-1">Match Filter:</span>
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none font-mono text-xs">
+          <span className="text-zinc-500 mr-1 flex items-center gap-1">
+            <Filter className="w-3 h-3 text-zinc-400" />
+            Match Filter:
+          </span>
           {(
             [
               { id: "ALL", label: "All Dossiers" },
@@ -148,9 +151,9 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
               <button
                 key={filter.id}
                 onClick={() => setScoreFilter(filter.id)}
-                className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
+                className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
                   active
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm"
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm font-bold"
                     : "bg-[#0a0b0e] text-zinc-400 border border-[#222730] hover:border-[#303744] hover:text-white"
                 }`}
               >
@@ -161,97 +164,96 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
         </div>
       </div>
 
-      {/* Dossiers Grid with AnimatePresence */}
+      {/* Dossiers Grid (GPU Accelerated, Zero Layout Thrashing) */}
       {filteredEvals.length === 0 ? (
-        <div className="text-center py-16 bg-[#13161a] border border-[#222730] rounded-2xl text-zinc-500">
+        <div className="text-center py-16 bg-[#13161a] border border-[#222730] rounded-2xl text-zinc-500 font-mono text-xs">
           <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p className="text-sm font-medium">No evaluation dossiers match your criteria.</p>
+          <p className="text-sm font-medium text-zinc-400">No evaluation dossiers match your criteria.</p>
         </div>
       ) : (
-        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <AnimatePresence mode="popLayout">
-            {filteredEvals.map((evaluation) => (
-              <motion.div
-                key={evaluation.id}
-                layout
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                onClick={() => handleOpenDossier(evaluation)}
-                className="bg-[#13161a] hover:bg-[#161a20] border border-[#222730] hover:border-[#303744] rounded-2xl p-5 transition-all cursor-pointer group shadow-md flex flex-col justify-between relative"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-3 mb-2">
-                    <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
-                      {evaluation.tender_reference}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredEvals.map((evaluation) => (
+            <div
+              key={evaluation.id}
+              onClick={() => handleOpenDossier(evaluation)}
+              style={{ willChange: "transform, opacity" }}
+              className="bg-[#13161a] hover:bg-[#161a20] border border-[#222730] hover:border-emerald-500/40 rounded-2xl p-5 transition-all duration-200 cursor-pointer group shadow-md flex flex-col justify-between relative hover:-translate-y-0.5"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/25">
+                    {evaluation.tender_reference}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={
+                        evaluation.final_bid_fit_score >= 75
+                          ? "success"
+                          : evaluation.final_bid_fit_score >= 50
+                          ? "warning"
+                          : "danger"
+                      }
+                    >
+                      {Math.round(evaluation.final_bid_fit_score)}% Match
+                    </Badge>
+
+                    <button
+                      onClick={(e) => handleDeleteDossier(e, evaluation.id)}
+                      disabled={deletingId === evaluation.id}
+                      title="Archive dossier"
+                      className="text-zinc-500 hover:text-red-400 p-1 rounded-lg hover:bg-[#1f242d] transition-colors"
+                    >
+                      {deletingId === evaluation.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors line-clamp-2 leading-snug mb-3">
+                  {evaluation.tender_title || evaluation.tender_reference}
+                </h3>
+
+                <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[#0a0b0e] border border-[#1f242d] text-center mb-4 font-mono">
+                  <div>
+                    <span className="text-[10px] text-zinc-500 block">TOLERANCE</span>
+                    <span className="text-xs font-bold text-white">
+                      {Math.round(evaluation.tolerance_score ?? 0)}%
                     </span>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={
-                          evaluation.final_bid_fit_score >= 75
-                            ? "success"
-                            : evaluation.final_bid_fit_score >= 50
-                            ? "warning"
-                            : "danger"
-                        }
-                      >
-                        {Math.round(evaluation.final_bid_fit_score)}% Match
-                      </Badge>
-
-                      <button
-                        type="button"
-                        aria-label="Delete dossier"
-                        onClick={(e) => handleDeleteDossier(e, evaluation.id)}
-                        disabled={deletingId === evaluation.id}
-                        className="p-1 text-zinc-500 hover:text-red-400 hover:bg-[#181c22] rounded-lg transition-colors"
-                      >
-                        {deletingId === evaluation.id ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
-                        ) : (
-                          <Trash2 className="w-3.5 h-3.5" />
-                        )}
-                      </button>
-                    </div>
                   </div>
-
-                  <h3 className="text-sm font-semibold text-white group-hover:text-emerald-300 transition-colors line-clamp-2 mb-3">
-                    {evaluation.tender_title || "ISRO Tender Specification Evaluation"}
-                  </h3>
-
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {evaluation.tender_mechanical_tolerances_met ? (
-                      <Badge variant="success">Tolerances Met</Badge>
-                    ) : (
-                      <Badge variant="danger">Tolerance Gap</Badge>
-                    )}
-                    {evaluation.missing_certifications.length === 0 ? (
-                      <Badge variant="success">Certs Compliant</Badge>
-                    ) : (
-                      <Badge variant="warning">{evaluation.missing_certifications.length} Cert Gaps</Badge>
-                    )}
-                    {evaluation.msme_waivers_applied.length > 0 && (
-                      <Badge variant="info">MSME EMD Waived</Badge>
-                    )}
+                  <div>
+                    <span className="text-[10px] text-zinc-500 block">CERTS</span>
+                    <span className="text-xs font-bold text-white">
+                      {Math.round(evaluation.certification_score ?? 0)}%
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-zinc-500 block">MSME GFR</span>
+                    <span className="text-xs font-bold text-emerald-400">
+                      {evaluation.msme_waivers_applied?.length > 0 ? "₹0 EMD" : "Standard"}
+                    </span>
                   </div>
                 </div>
+              </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-[#222730] text-xs">
-                  <span className="text-zinc-500 font-mono text-[11px]">
-                    {formatDate(evaluation.evaluated_at)}
-                  </span>
-                  <span className="text-emerald-400 font-semibold text-xs flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                    <span>Inspect Full Dossier</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+              <div className="flex items-center justify-between pt-3 border-t border-[#1f242d] text-[11px] font-mono text-zinc-400">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  {evaluation.issuing_center || "ISRO HQ"} • {formatDate(evaluation.evaluated_at)}
+                </span>
+                <span className="text-emerald-400 font-semibold group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                  <span>Open Dossier</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
-      {/* Detail Modal */}
+      {/* AI Evaluation Modal */}
       <AiEvaluationModal
         tender={selectedTender}
         evaluation={selectedEval}

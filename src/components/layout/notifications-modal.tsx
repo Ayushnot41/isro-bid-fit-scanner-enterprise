@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import {
   Bell,
   CheckCheck,
@@ -170,10 +172,28 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 ];
 
 export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [activeTab, setActiveTab] = useState<"ALL" | "AI_INSIGHT" | "TENDER" | "STATUTORY" | "SUITE">("ALL");
   const [selectedInsight, setSelectedInsight] = useState<NotificationItem | null>(null);
   const [suiteCategory, setSuiteCategory] = useState<"WIN_SIM" | "MATERIALS" | "MSME" | "WEBCMD" | "PGVECTOR">("WIN_SIM");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Lock background scroll when notifications modal is open
+  useLockBodyScroll(isOpen);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -196,31 +216,34 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     return n.category === activeTab;
   });
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-end sm:p-6 p-2 bg-black/65 backdrop-blur-md hardware-accelerated">
-          {/* Backdrop Click to Close */}
+        <div className="fixed inset-0 z-[100] flex items-start justify-end p-3 sm:p-6 pt-16 sm:pt-6 overflow-hidden pointer-events-auto">
+          {/* Pure Dark Backdrop Overlay - Zero GPU Blur Latency */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             onClick={onClose}
-            className="absolute inset-0"
+            className="fixed inset-0 bg-black/80 cursor-pointer"
           />
 
-          {/* Modal Container */}
+          {/* Modal Container - Ultra-Fast 120 FPS Entrance */}
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className={`relative z-10 w-full ${
-              activeTab === "SUITE" || selectedInsight ? "max-w-2xl" : "max-w-lg"
-            } bg-[#13161a] border border-emerald-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] mt-12 sm:mt-0 transition-all duration-300`}
+            initial={{ opacity: 0, scale: 0.97, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: -10 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            className={`relative z-10 w-full sm:w-[500px] ${
+              activeTab === "SUITE" || selectedInsight ? "sm:w-[650px]" : ""
+            } h-[86vh] max-h-[86vh] bg-[#0e1115] border border-emerald-500/40 rounded-2xl shadow-2xl shadow-black overflow-hidden flex flex-col`}
           >
             {/* Modal Header */}
-            <div className="p-4 bg-[#0d0f12] border-b border-[#222730] flex items-center justify-between">
+            <div className="flex-shrink-0 p-4 bg-[#0d0f12] border-b border-[#222730] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                   <Bell className="w-4 h-4" />
@@ -261,7 +284,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
             </div>
 
             {/* Navigation & Section Tabs */}
-            <div className="px-4 py-2 bg-[#0a0b0e] border-b border-[#222730] flex items-center gap-1.5 overflow-x-auto text-xs font-mono">
+            <div className="flex-shrink-0 px-4 py-2 bg-[#0a0b0e] border-b border-[#222730] flex items-center gap-1.5 overflow-x-auto text-xs font-mono no-scrollbar">
               <button
                 onClick={() => {
                   setActiveTab("ALL");
@@ -337,7 +360,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
 
             {/* DEDICATED AI SUITE VIEW */}
             {activeTab === "SUITE" ? (
-              <div className="flex-1 p-4 overflow-y-auto space-y-4 text-xs font-sans">
+              <div className="flex-1 min-h-0 p-4 overflow-y-auto overscroll-contain custom-scrollbar space-y-4 text-xs font-sans">
                 {/* Suite Category Pills */}
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 font-mono text-[11px]">
                   <button
@@ -517,7 +540,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
               </div>
             ) : selectedInsight && selectedInsight.aiDeepInsight ? (
               /* SELECTED SINGLE INSIGHT DEEP DIVE */
-              <div className="flex-1 p-5 overflow-y-auto space-y-4 text-xs font-sans">
+              <div className="flex-1 min-h-0 p-5 overflow-y-auto overscroll-contain custom-scrollbar space-y-4 text-xs font-sans">
                 <button
                   onClick={() => setSelectedInsight(null)}
                   className="text-xs font-mono text-zinc-400 hover:text-emerald-400 flex items-center gap-1 transition-colors"
@@ -565,7 +588,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
               </div>
             ) : (
               /* STANDARD NOTIFICATIONS FEED */
-              <div className="flex-1 p-3 overflow-y-auto space-y-2">
+              <div className="flex-1 min-h-0 p-3 overflow-y-auto overscroll-contain custom-scrollbar space-y-2">
                 {filtered.map((item) => (
                   <div
                     key={item.id}
@@ -647,7 +670,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
             )}
 
             {/* Modal Footer */}
-            <div className="p-3 bg-[#0d0f12] border-t border-[#222730] flex items-center justify-between text-xs font-mono">
+            <div className="flex-shrink-0 p-3 bg-[#0d0f12] border-t border-[#222730] flex items-center justify-between text-xs font-mono">
               <span className="text-zinc-500 text-[11px] flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 Live WebCMD + Grok AI Telemetry Daemon
@@ -665,4 +688,6 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
       )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

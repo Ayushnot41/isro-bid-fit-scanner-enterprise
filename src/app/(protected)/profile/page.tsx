@@ -239,7 +239,7 @@ export default function ProfilePage() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto selection:bg-emerald-500/30">
+    <div className="space-y-6 max-w-5xl mx-auto selection:bg-emerald-500/30 pb-24">
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-[#0e1115] border border-[#222730] rounded-2xl shadow-xl">
