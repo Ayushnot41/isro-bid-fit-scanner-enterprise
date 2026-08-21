@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Users, Handshake, ShieldCheck, Sparkles, Building, MapPin, CheckCircle2, ArrowRight, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface PartnerMatch {
   id: string;
@@ -64,6 +65,8 @@ export function ConsortiumMatcher({
   const [selectedPartners, setSelectedPartners] = useState<string[]>(["part-1"]);
   const [consortiumSubmitted, setConsortiumSubmitted] = useState(false);
 
+  useLockBodyScroll(isOpen);
+
   const togglePartner = (id: string) => {
     setSelectedPartners((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
@@ -74,7 +77,7 @@ export function ConsortiumMatcher({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hardware-accelerated">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-hidden">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -91,7 +94,7 @@ export function ConsortiumMatcher({
           className="relative z-10 w-full max-w-2xl bg-[#0e1115] border border-emerald-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]"
         >
           {/* Header */}
-          <div className="p-4 bg-[#13161a] border-b border-[#222730] flex items-center justify-between">
+          <div className="flex-shrink-0 p-4 bg-[#13161a] border-b border-[#222730] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                 <Handshake className="w-4 h-4" />
@@ -118,7 +121,7 @@ export function ConsortiumMatcher({
           </div>
 
           {/* Body */}
-          <div className="p-5 overflow-y-auto space-y-4 text-xs font-sans">
+          <div className="flex-1 min-h-0 p-5 overflow-y-auto overscroll-contain custom-scrollbar space-y-4 text-xs font-sans">
             <div className="p-3.5 rounded-xl bg-[#13161a] border border-[#222730] flex items-start gap-3">
               <Sparkles className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
               <div className="space-y-1">
@@ -193,7 +196,7 @@ export function ConsortiumMatcher({
           </div>
 
           {/* Footer */}
-          <div className="p-3.5 bg-[#13161a] border-t border-[#222730] flex items-center justify-between">
+          <div className="flex-shrink-0 p-3.5 bg-[#13161a] border-t border-[#222730] flex items-center justify-between">
             <span className="text-[11px] font-mono text-zinc-400">
               {selectedPartners.length} Partner(s) Selected for Consortium
             </span>
