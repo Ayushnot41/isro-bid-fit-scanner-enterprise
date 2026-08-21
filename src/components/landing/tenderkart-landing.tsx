@@ -26,7 +26,9 @@ import {
   KeyRound,
   Lock,
   X,
-  ShieldAlert,
+  RotateCw,
+  Eye,
+  Activity,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -47,10 +49,15 @@ export function TenderkartLanding() {
   const [showAuthGateModal, setShowAuthGateModal] = useState(false);
   const [authGateAction, setAuthGateAction] = useState("access this procurement tool");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // 3D Hero Component Controls
+  const [hero3dMode, setHero3dMode] = useState<"SOLID" | "WIREFRAME" | "STRESS">("SOLID");
+  const [isOrbiting, setIsOrbiting] = useState(true);
+  const [activeProbe, setActiveProbe] = useState<"GIMBAL" | "VALVE" | "ALLOY">("GIMBAL");
+
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user has an active session
     if (typeof document !== "undefined") {
       const hasCookie = document.cookie.includes("demo_session=true") || document.cookie.includes("sb-access-token");
       setIsAuthenticated(hasCookie);
@@ -178,8 +185,8 @@ export function TenderkartLanding() {
         </div>
       </motion.header>
 
-      {/* Hero Section */}
-      <section className="relative pt-16 pb-12 px-6 sm:px-12 max-w-6xl mx-auto text-center space-y-6">
+      {/* Hero Section with Interactive 3D Aerospace Hardware Showcase */}
+      <section className="relative pt-12 pb-12 px-6 sm:px-12 max-w-7xl mx-auto space-y-8">
         <div
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
           style={{
@@ -189,91 +196,228 @@ export function TenderkartLanding() {
           }}
         />
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#13161a] border border-emerald-500/30 text-emerald-400 text-xs font-mono"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          ISRO Space Procurement & Defense Bid Intelligence
-        </motion.div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Left Column: Text & CTAs */}
+          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#13161a] border border-emerald-500/30 text-emerald-400 text-xs font-mono"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              ISRO Space Procurement & Defense Bid Intelligence
+            </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.05 }}
-          className="text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight max-w-4xl mx-auto font-sans"
-        >
-          Autonomous ISRO Tender Intelligence & Bid-Fit Scanner
-        </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.05 }}
+              className="text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight font-sans"
+            >
+              Autonomous ISRO Tender Intelligence & Bid-Fit Scanner
+            </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.1 }}
-          className="text-sm sm:text-base text-zinc-300 max-w-2xl mx-auto leading-relaxed"
-        >
-          Scan space-grade RFPs, verify GD&T micro-tolerances (±5 µm), apply statutory MSME EMD exemptions under GFR 170(i), and generate technical proposals in seconds.
-        </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.1 }}
+              className="text-sm sm:text-base text-zinc-300 max-w-xl leading-relaxed"
+            >
+              Scan space-grade RFPs, verify GD&T micro-tolerances (±5 µm), apply statutory MSME EMD exemptions under GFR 170(i), and generate technical proposals in seconds.
+            </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.15 }}
-          className="flex flex-wrap items-center justify-center gap-3 pt-2"
-        >
-          <button
-            onClick={() => handleProtectedAction("launch command center", () => router.push("/dashboard"))}
-            className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-950/40 active:scale-95"
-          >
-            <span>Launch Command Center</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-          <Link
-            href="/login"
-            className="px-6 py-3 rounded-xl bg-[#13161a] hover:bg-[#1a1f26] text-zinc-200 border border-[#222730] font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
-          >
-            <ShieldCheck className="w-4 h-4 text-cyan-400" />
-            <span>Sign In as Supplier</span>
-          </Link>
-          <Link
-            href="/register"
-            className="px-6 py-3 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/40 text-cyan-300 border border-cyan-500/30 font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
-          >
-            <Building2 className="w-4 h-4" />
-            <span>Onboard Workshop (MSME)</span>
-          </Link>
-        </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.15 }}
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2"
+            >
+              <button
+                onClick={() => handleProtectedAction("launch command center", () => router.push("/dashboard"))}
+                className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-950/40 active:scale-95"
+              >
+                <span>Launch Command Center</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <Link
+                href="/login"
+                className="px-6 py-3 rounded-xl bg-[#13161a] hover:bg-[#1a1f26] text-zinc-200 border border-[#222730] font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
+              >
+                <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                <span>Sign In as Supplier</span>
+              </Link>
+              <Link
+                href="/register"
+                className="px-6 py-3 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/40 text-cyan-300 border border-cyan-500/30 font-mono text-xs font-semibold flex items-center gap-2 transition-colors"
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Onboard Workshop (MSME)</span>
+              </Link>
+            </motion.div>
 
-        {/* Real-time Telemetry Strip */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 max-w-4xl mx-auto font-mono text-xs text-left"
-        >
-          <div className="p-3.5 rounded-xl bg-[#0e1115] border border-[#222730] hover:border-emerald-500/30 transition-colors">
-            <span className="text-zinc-500 text-[10px] block">MONITORED</span>
-            <span className="text-white font-bold text-sm">6 ISRO Centers</span>
+            {/* Metrics Strip */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4 font-mono text-xs text-left"
+            >
+              <div className="p-3 rounded-xl bg-[#0e1115] border border-[#222730]">
+                <span className="text-zinc-500 text-[10px] block">MONITORED</span>
+                <span className="text-white font-bold text-xs sm:text-sm">6 ISRO Centers</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#0e1115] border border-[#222730]">
+                <span className="text-zinc-500 text-[10px] block">STATUTORY</span>
+                <span className="text-emerald-400 font-bold text-xs sm:text-sm">100% GFR 170(i)</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#0e1115] border border-[#222730]">
+                <span className="text-zinc-500 text-[10px] block">ACCURACY</span>
+                <span className="text-cyan-400 font-bold text-xs sm:text-sm">95% Fit Score</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#0e1115] border border-[#222730]">
+                <span className="text-zinc-500 text-[10px] block">MSME BENEFIT</span>
+                <span className="text-amber-400 font-bold text-xs sm:text-sm">₹0 EMD Deposit</span>
+              </div>
+            </motion.div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#0e1115] border border-[#222730] hover:border-emerald-500/30 transition-colors">
-            <span className="text-zinc-500 text-[10px] block">STATUTORY</span>
-            <span className="text-emerald-400 font-bold text-sm">100% GFR 170(i)</span>
+
+          {/* Right Column: 3D Aerospace Hardware Showcase Component */}
+          <div className="lg:col-span-5 relative">
+            <style jsx>{`
+              @keyframes heroOrbit {
+                0% {
+                  transform: rotateX(22deg) rotateY(0deg);
+                }
+                100% {
+                  transform: rotateX(22deg) rotateY(360deg);
+                }
+              }
+              .hero-3d-active {
+                animation: heroOrbit 14s linear infinite;
+                transform-style: preserve-3d;
+                will-change: transform;
+              }
+              .hero-3d-static {
+                transform: rotateX(22deg) rotateY(45deg);
+                transform-style: preserve-3d;
+              }
+            `}</style>
+
+            <div className="relative p-6 rounded-3xl bg-[#0e1115]/90 border border-cyan-500/30 backdrop-blur-xl shadow-2xl shadow-cyan-950/20 overflow-hidden">
+              {/* Header HUD */}
+              <div className="flex items-center justify-between pb-3 border-b border-[#222730] text-xs font-mono">
+                <div className="flex items-center gap-2">
+                  <Box className="w-4 h-4 text-cyan-400" />
+                  <span className="text-white font-bold">3D PSLV Stage-4 Gimbal Module</span>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[10px] bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                  GPU 120 FPS
+                </span>
+              </div>
+
+              {/* 3D Hardware Canvas */}
+              <div className="h-[280px] relative flex items-center justify-center overflow-hidden select-none my-3">
+                <div
+                  style={{ perspective: "1000px" }}
+                  className="relative"
+                >
+                  <div className={`w-44 h-44 relative ${isOrbiting ? "hero-3d-active" : "hero-3d-static"}`}>
+                    {/* Front Face */}
+                    <div
+                      style={{ transform: "translateZ(88px)" }}
+                      className={`absolute inset-0 rounded-2xl border-2 flex flex-col items-center justify-center p-3 transition-all ${
+                        hero3dMode === "WIREFRAME"
+                          ? "border-cyan-400/80 bg-cyan-950/10"
+                          : hero3dMode === "STRESS"
+                          ? "border-amber-400/80 bg-amber-950/20 shadow-lg shadow-amber-500/20"
+                          : "border-cyan-500/40 bg-zinc-900/90 shadow-2xl"
+                      }`}
+                    >
+                      <div className="w-12 h-12 rounded-full border-2 border-emerald-400 flex items-center justify-center bg-emerald-950/30">
+                        <span className="text-[9px] font-mono text-emerald-300 font-bold">Ø 42.00</span>
+                      </div>
+                      <span className="text-[9px] font-mono text-cyan-300 mt-2 font-bold">Stage-4 Gimbal</span>
+                      <span className="text-[8px] font-mono text-zinc-400">±0.005 mm</span>
+                    </div>
+
+                    {/* Back Face */}
+                    <div
+                      style={{ transform: "rotateY(180deg) translateZ(88px)" }}
+                      className="absolute inset-0 rounded-2xl border-2 border-purple-500/40 bg-zinc-900/90 flex flex-col items-center justify-center p-3"
+                    >
+                      <span className="text-[9px] font-mono text-purple-300 font-bold">LH2 Valve Port</span>
+                      <span className="text-[8px] font-mono text-zinc-400 mt-1">Ra 0.3 µm</span>
+                    </div>
+
+                    {/* Right Face */}
+                    <div
+                      style={{ transform: "rotateY(90deg) translateZ(88px)" }}
+                      className="absolute inset-0 rounded-2xl border-2 border-emerald-500/40 bg-zinc-900/90 flex items-center justify-center"
+                    >
+                      <span className="text-[9px] font-mono text-emerald-400 font-bold">920 MPa Yield</span>
+                    </div>
+
+                    {/* Left Face */}
+                    <div
+                      style={{ transform: "rotateY(-90deg) translateZ(88px)" }}
+                      className="absolute inset-0 rounded-2xl border-2 border-amber-500/40 bg-zinc-900/90 flex items-center justify-center"
+                    >
+                      <span className="text-[9px] font-mono text-amber-400 font-bold">Ti-6Al-4V Gr 5</span>
+                    </div>
+
+                    {/* Top Face */}
+                    <div
+                      style={{ transform: "rotateX(90deg) translateZ(88px)" }}
+                      className="absolute inset-0 rounded-2xl border-2 border-cyan-500/30 bg-zinc-950/90 flex items-center justify-center"
+                    >
+                      <span className="text-[8px] font-mono text-cyan-300">5-Axis CNC</span>
+                    </div>
+
+                    {/* Bottom Face */}
+                    <div
+                      style={{ transform: "rotateX(-90deg) translateZ(88px)" }}
+                      className="absolute inset-0 rounded-2xl border-2 border-zinc-700 bg-zinc-950/90 flex items-center justify-center"
+                    >
+                      <span className="text-[8px] font-mono text-zinc-400">Cryogenic 20K</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Overlaid Live Spec Badge */}
+                <div className="absolute bottom-2 left-2 p-2 rounded-lg bg-zinc-950/90 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 space-y-0.5">
+                  <p>• Concentricity: <strong className="text-white">Ø 0.008 mm</strong></p>
+                  <p>• Cleanroom: <strong className="text-white">ISO Class 7</strong></p>
+                </div>
+              </div>
+
+              {/* 3D Control Bar */}
+              <div className="pt-3 border-t border-[#222730] flex items-center justify-between text-xs font-mono">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setHero3dMode(hero3dMode === "SOLID" ? "WIREFRAME" : hero3dMode === "WIREFRAME" ? "STRESS" : "SOLID")}
+                    className="px-2.5 py-1 rounded-lg bg-[#14181f] text-cyan-300 border border-cyan-500/30 text-[10px] hover:bg-cyan-500/20 transition-colors"
+                  >
+                    Mode: {hero3dMode}
+                  </button>
+                  <button
+                    onClick={() => setIsOrbiting(!isOrbiting)}
+                    className="p-1 rounded-lg bg-[#14181f] text-zinc-400 hover:text-white border border-[#222730] transition-colors"
+                    title="Toggle auto orbit"
+                  >
+                    <RotateCw className={`w-3.5 h-3.5 ${isOrbiting ? "animate-spin" : ""}`} />
+                  </button>
+                </div>
+
+                <span className="text-[10px] text-zinc-500">ISRO-DWG-009 CAD Spine</span>
+              </div>
+            </div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#0e1115] border border-[#222730] hover:border-cyan-500/30 transition-colors">
-            <span className="text-zinc-500 text-[10px] block">ACCURACY</span>
-            <span className="text-cyan-400 font-bold text-sm">95% Fit Score</span>
-          </div>
-          <div className="p-3.5 rounded-xl bg-[#0e1115] border border-[#222730] hover:border-amber-500/30 transition-colors">
-            <span className="text-zinc-500 text-[10px] block">MSME BENEFIT</span>
-            <span className="text-amber-400 font-bold text-sm">₹0 EMD Deposit</span>
-          </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* Live Tenders Discovery Terminal (Viewable, Action Gated) */}
-      <section className="py-10 px-6 sm:px-12 max-w-6xl mx-auto space-y-5 border-t border-[#1e232b]">
+      <section className="py-10 px-6 sm:px-12 max-w-7xl mx-auto space-y-5 border-t border-[#1e232b]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-white font-sans flex items-center gap-2">
@@ -375,8 +519,8 @@ export function TenderkartLanding() {
         </div>
       </section>
 
-      {/* Strategic Toolkit Grid */}
-      <section className="py-12 px-6 sm:px-12 max-w-6xl mx-auto space-y-6 border-t border-[#1e232b]">
+      {/* Strategic 3D Material & Capability Toolkit */}
+      <section className="py-12 px-6 sm:px-12 max-w-7xl mx-auto space-y-6 border-t border-[#1e232b]">
         <div className="text-center space-y-1.5">
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight font-sans">
             Complete Aerospace Bidding Intelligence Suite
@@ -420,7 +564,7 @@ export function TenderkartLanding() {
       </section>
 
       {/* Institutional Sign-up / Onboarding Banner */}
-      <section className="py-12 px-6 sm:px-12 max-w-6xl mx-auto">
+      <section className="py-12 px-6 sm:px-12 max-w-7xl mx-auto">
         <div className="p-8 rounded-3xl bg-gradient-to-r from-[#0d131a] via-[#101720] to-[#0d131a] border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
           <div className="space-y-2 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
@@ -455,7 +599,7 @@ export function TenderkartLanding() {
       </section>
 
       {/* Minimalist Institutional Footer */}
-      <footer className="py-8 px-6 sm:px-12 border-t border-[#1e232b] bg-[#0d0f12] text-xs font-mono text-zinc-500 flex flex-wrap items-center justify-between gap-4 max-w-6xl mx-auto">
+      <footer className="py-8 px-6 sm:px-12 border-t border-[#1e232b] bg-[#0d0f12] text-xs font-mono text-zinc-500 flex flex-wrap items-center justify-between gap-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-400" />
           <span>ISRO Bid-Fit Scanner Enterprise • GFR 2017 & MSMED Act Standard</span>

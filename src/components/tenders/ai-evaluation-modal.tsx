@@ -55,23 +55,23 @@ export function AiEvaluationModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto selection:bg-emerald-500/30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden selection:bg-emerald-500/30 hardware-accelerated">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/85 backdrop-blur-md"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md"
           />
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-4xl max-h-[90vh] bg-[#0e1115] border border-[#222730] rounded-2xl shadow-2xl shadow-black/80 flex flex-col overflow-hidden z-10"
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-4xl max-h-[85vh] bg-[#0e1115] border border-[#222730] rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden z-10 my-auto"
           >
             {/* Modal Header */}
             <div className="p-5 sm:p-6 border-b border-[#222730] flex items-start justify-between bg-[#13161a]">
