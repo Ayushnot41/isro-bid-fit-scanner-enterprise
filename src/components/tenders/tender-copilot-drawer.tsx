@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare, Send, Sparkles, X, Bot, User, CheckCircle2, ShieldCheck, AlertCircle, FileText, HelpCircle, ArrowRight, Layers, Target, TrendingUp, DollarSign } from "lucide-react";
+import { MessageSquare, Send, Sparkles, X, Bot, User, Layers, Target, DollarSign, ArrowRight } from "lucide-react";
 import type { ScrapedTender } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TenderCoPilotDrawerProps {
   tender: ScrapedTender | null;
@@ -62,7 +63,7 @@ export function TenderCoPilotDrawer({ tender, isOpen, onClose }: TenderCoPilotDr
           content: `Hello! I am your AI Tender CoPilot for ${tender.reference_number} (${tender.issuing_center}).
 
 Click any question chip above or ask anything about eligibility, tolerances, GFR 170(i) exemptions, documents, or strategic bidding!`,
-          timestamp: new Date().toLocaleTimeString(),
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
     }
@@ -81,7 +82,7 @@ Click any question chip above or ask anything about eligibility, tolerances, GFR
       id: Math.random().toString(36).substring(2, 9),
       role: "user",
       content: textToSend,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -103,7 +104,7 @@ Click any question chip above or ask anything about eligibility, tolerances, GFR
         id: Math.random().toString(36).substring(2, 9),
         role: "assistant",
         content: data.reply || "Could not retrieve response.",
-        timestamp: new Date().toLocaleTimeString(),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch {
@@ -113,7 +114,7 @@ Click any question chip above or ask anything about eligibility, tolerances, GFR
           id: Math.random().toString(36).substring(2, 9),
           role: "assistant",
           content: "1. 100% Free EMD: Under GFR 2017 Rule 170(i), your verified MSME status provides a 100% waiver.\n2. Tolerance: Your 5-Axis CNC capability (±5 µm) meets ISRO NIT requirements.\n\nBottom Line: You can submit your bid with zero upfront cash deposit.",
-          timestamp: new Date().toLocaleTimeString(),
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
     } finally {
@@ -129,175 +130,193 @@ Click any question chip above or ask anything about eligibility, tolerances, GFR
   });
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] bg-zinc-950/95 backdrop-blur-2xl border-l border-[#222730] shadow-2xl flex flex-col hardware-accelerated">
-      {/* Header */}
-      <div className="p-4 bg-[#13161a] border-b border-[#222730] flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-            <Bot className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
-              Tender CoPilot Intelligence <Sparkles className="w-3 h-3 text-cyan-400" />
-            </h3>
-            <p className="text-[10px] text-zinc-400 font-mono truncate max-w-[260px]">
-              {tender.reference_number} • {tender.issuing_center}
-            </p>
-          </div>
-        </div>
-
-        <button
+    <AnimatePresence>
+      <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-50 flex items-end justify-center sm:block p-3 sm:p-0">
+        {/* Backdrop for mobile */}
+        <div
           onClick={onClose}
-          className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm sm:hidden z-0"
+        />
+
+        {/* Compact, Optimized CoPilot Window */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94, y: 15 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.94, y: 15 }}
+          transition={{ type: "spring", stiffness: 350, damping: 25 }}
+          className="relative z-10 w-full sm:w-[420px] h-[520px] max-h-[85vh] bg-[#0c0e12]/95 backdrop-blur-xl border border-cyan-500/40 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden font-sans hardware-accelerated"
         >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Relatable Question Category Filter Tabs */}
-      <div className="px-3 pt-2 pb-1 bg-[#0a0b0e] border-b border-[#222730] space-y-1.5 font-mono text-[11px]">
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar text-[10px]">
-          <button
-            onClick={() => setActiveCategory("ALL")}
-            className={`px-2 py-0.5 rounded-md transition-colors whitespace-nowrap ${
-              activeCategory === "ALL"
-                ? "bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            All Questions ({CATEGORIZED_PROMPTS.length})
-          </button>
-          <button
-            onClick={() => setActiveCategory("ELIGIBILITY")}
-            className={`px-2 py-0.5 rounded-md transition-colors whitespace-nowrap ${
-              activeCategory === "ELIGIBILITY"
-                ? "bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            🎯 Eligibility & Gaps
-          </button>
-          <button
-            onClick={() => setActiveCategory("FINANCIAL")}
-            className={`px-2 py-0.5 rounded-md transition-colors whitespace-nowrap ${
-              activeCategory === "FINANCIAL"
-                ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            💰 Financial / EMD
-          </button>
-          <button
-            onClick={() => setActiveCategory("ACTION")}
-            className={`px-2 py-0.5 rounded-md transition-colors whitespace-nowrap ${
-              activeCategory === "ACTION"
-                ? "bg-purple-500/20 text-purple-300 font-bold border border-purple-500/40"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            📋 Action & Prep
-          </button>
-          <button
-            onClick={() => setActiveCategory("STRATEGY")}
-            className={`px-2 py-0.5 rounded-md transition-colors whitespace-nowrap ${
-              activeCategory === "STRATEGY"
-                ? "bg-blue-500/20 text-blue-300 font-bold border border-blue-500/40"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            🚀 Strategy
-          </button>
-        </div>
-
-        {/* Relatable Question Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 no-scrollbar">
-          {displayedPrompts.map((item, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSend(item.prompt)}
-              className="px-2.5 py-1 rounded-lg bg-[#14181f] hover:bg-[#1f2530] text-zinc-300 hover:text-cyan-300 border border-[#222730] hover:border-cyan-500/30 whitespace-nowrap transition-colors flex-shrink-0 text-[11px]"
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Messages Feed */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-3 font-sans text-xs custom-scrollbar">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex items-start gap-2.5 ${
-              msg.role === "user" ? "flex-row-reverse" : "flex-row"
-            }`}
-          >
-            <div
-              className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                msg.role === "user"
-                  ? "bg-emerald-600 text-white"
-                  : "bg-cyan-950 border border-cyan-500/40 text-cyan-300"
-              }`}
-            >
-              {msg.role === "user" ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
-            </div>
-
-            <div
-              className={`max-w-[85%] p-3 rounded-2xl leading-relaxed whitespace-pre-wrap ${
-                msg.role === "user"
-                  ? "bg-emerald-600 text-white rounded-tr-none font-medium"
-                  : "bg-[#13161a] border border-[#222730] text-zinc-200 rounded-tl-none font-normal shadow-sm"
-              }`}
-            >
-              {msg.content}
-              <div
-                className={`text-[9px] mt-1.5 font-mono ${
-                  msg.role === "user" ? "text-emerald-200 text-right" : "text-zinc-500"
-                }`}
-              >
-                {msg.timestamp}
+          {/* Compact Header */}
+          <div className="px-4 py-2.5 bg-[#13161a] border-b border-[#222730] flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <Bot className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <h3 className="text-xs font-mono font-bold text-white flex items-center gap-1.5 leading-none">
+                  Tender CoPilot <Sparkles className="w-3 h-3 text-cyan-400" />
+                </h3>
+                <p className="text-[10px] text-zinc-400 font-mono truncate max-w-[240px] mt-0.5">
+                  {tender.reference_number} • {tender.issuing_center}
+                </p>
               </div>
             </div>
+
+            <button
+              onClick={onClose}
+              className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-        ))}
 
-        {loading && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-[#13161a] border border-[#222730] text-cyan-400 font-mono text-[11px] w-fit">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            <span>Consulting ISRO Procurement Manual & Grok AI...</span>
+          {/* Quick-Access Relatable Category Tabs */}
+          <div className="px-3 py-1.5 bg-[#090b0e] border-b border-[#222730] space-y-1 font-mono text-[10px] flex-shrink-0">
+            <div className="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar">
+              <button
+                onClick={() => setActiveCategory("ALL")}
+                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
+                  activeCategory === "ALL"
+                    ? "bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                All ({CATEGORIZED_PROMPTS.length})
+              </button>
+              <button
+                onClick={() => setActiveCategory("ELIGIBILITY")}
+                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
+                  activeCategory === "ELIGIBILITY"
+                    ? "bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                🎯 Gaps
+              </button>
+              <button
+                onClick={() => setActiveCategory("FINANCIAL")}
+                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
+                  activeCategory === "FINANCIAL"
+                    ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                💰 EMD
+              </button>
+              <button
+                onClick={() => setActiveCategory("ACTION")}
+                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
+                  activeCategory === "ACTION"
+                    ? "bg-purple-500/20 text-purple-300 font-bold border border-purple-500/40"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                📋 Prep
+              </button>
+              <button
+                onClick={() => setActiveCategory("STRATEGY")}
+                className={`px-2 py-0.5 rounded transition-colors whitespace-nowrap ${
+                  activeCategory === "STRATEGY"
+                    ? "bg-blue-500/20 text-blue-300 font-bold border border-blue-500/40"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                🚀 Strategy
+              </button>
+            </div>
+
+            {/* Quick Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+              {displayedPrompts.map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSend(item.prompt)}
+                  className="px-2 py-0.5 rounded bg-[#13161a] hover:bg-[#1c222b] text-zinc-300 hover:text-cyan-300 border border-[#222730] hover:border-cyan-500/30 whitespace-nowrap transition-colors flex-shrink-0 text-[10px]"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
           </div>
-        )}
 
-        <div ref={chatEndRef} />
-      </div>
+          {/* Messages Feed (Scrollable Center) */}
+          <div className="flex-1 p-3.5 overflow-y-auto space-y-2.5 font-sans text-xs custom-scrollbar">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex items-start gap-2 ${
+                  msg.role === "user" ? "flex-row-reverse" : "flex-row"
+                }`}
+              >
+                <div
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                    msg.role === "user"
+                      ? "bg-emerald-600 text-white"
+                      : "bg-cyan-950 border border-cyan-500/40 text-cyan-300"
+                  }`}
+                >
+                  {msg.role === "user" ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
+                </div>
 
-      {/* Input Box */}
-      <div className="p-3 bg-[#13161a] border-t border-[#222730]">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSend();
-          }}
-          className="flex items-center gap-2"
-        >
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask any tender question (e.g. EMD waiver, tolerances, materials)..."
-            disabled={loading}
-            className="flex-1 px-3.5 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 transition-all font-sans"
-          />
-          <Button
-            type="submit"
-            disabled={loading || !input.trim()}
-            className="px-3.5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-mono font-bold transition-all shadow-md flex items-center gap-1.5 flex-shrink-0"
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Send</span>
-          </Button>
-        </form>
+                <div
+                  className={`max-w-[85%] p-2.5 rounded-xl leading-relaxed whitespace-pre-wrap text-[11.5px] ${
+                    msg.role === "user"
+                      ? "bg-emerald-600 text-white rounded-tr-none font-medium"
+                      : "bg-[#13161a] border border-[#222730] text-zinc-200 rounded-tl-none font-normal shadow-sm"
+                  }`}
+                >
+                  {msg.content}
+                  <div
+                    className={`text-[8.5px] mt-1 font-mono ${
+                      msg.role === "user" ? "text-emerald-200 text-right" : "text-zinc-500"
+                    }`}
+                  >
+                    {msg.timestamp}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {loading && (
+              <div className="flex items-center gap-1.5 p-2 rounded-lg bg-[#13161a] border border-[#222730] text-cyan-400 font-mono text-[10px] w-fit">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                <span>Consulting ISRO Procurement Manual & Grok AI...</span>
+              </div>
+            )}
+
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Compact Input Bar (Directly below messages, easily reachable!) */}
+          <div className="p-2.5 bg-[#13161a] border-t border-[#222730] flex-shrink-0">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSend();
+              }}
+              className="flex items-center gap-1.5"
+            >
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask any question (e.g. EMD waiver, tolerances)..."
+                disabled={loading}
+                className="flex-1 px-3 py-2 bg-[#090b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 transition-all font-sans"
+              />
+              <Button
+                type="submit"
+                size="sm"
+                disabled={loading || !input.trim()}
+                className="px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-mono font-bold transition-all shadow-md flex items-center gap-1 flex-shrink-0"
+              >
+                <Send className="w-3 h-3" />
+                <span>Send</span>
+              </Button>
+            </form>
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </AnimatePresence>
   );
 }
