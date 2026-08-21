@@ -461,12 +461,14 @@ export function TenderList({ tenders: initialTenders, evaluations = [] }: Tender
       </div>
 
       {/* Interactive AI Evaluation Modal */}
-      <AiEvaluationModal
-        tender={activeModalTender}
-        evaluation={activeModalEvaluation}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {activeModalTender && activeModalEvaluation && (
+        <AiEvaluationModal
+          tender={activeModalTender}
+          evaluation={activeModalEvaluation}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
 
       {/* Autonomous WebCMD Mission Control Terminal */}
       <WebCmdTerminal

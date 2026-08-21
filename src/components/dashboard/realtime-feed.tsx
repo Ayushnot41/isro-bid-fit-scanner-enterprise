@@ -23,38 +23,50 @@ export function RealtimeFeed({ initialEvaluations }: RealtimeFeedProps) {
   const [selectedEvaluation, setSelectedEvaluation] = useState<BidEvaluation | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const supabase = createClient();
-
   useEffect(() => {
-    const channel = supabase
-      .channel("bid-evaluations-realtime-feed")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "bid_evaluations",
-        },
-        (payload) => {
-          const newEval = payload.new as BidEvaluation;
-          setEvaluations((prev) => [newEval, ...prev]);
-          setNewIds((prev) => new Set(prev).add(newEval.id));
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+      if (!supabaseUrl || supabaseUrl.includes("your-project")) {
+        return;
+      }
 
-          setTimeout(() => {
-            setNewIds((prev) => {
-              const next = new Set(prev);
-              next.delete(newEval.id);
-              return next;
-            });
-          }, 6000);
-        }
-      )
-      .subscribe();
+      const supabase = createClient();
+      const channel = supabase
+        .channel("bid-evaluations-realtime-feed")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "bid_evaluations",
+          },
+          (payload) => {
+            const newEval = payload.new as BidEvaluation;
+            if (newEval && newEval.id) {
+              setEvaluations((prev) => [newEval, ...prev]);
+              setNewIds((prev) => new Set(prev).add(newEval.id));
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase]);
+              setTimeout(() => {
+                setNewIds((prev) => {
+                  const next = new Set(prev);
+                  next.delete(newEval.id);
+                  return next;
+                });
+              }, 6000);
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        try {
+          supabase.removeChannel(channel);
+        } catch {}
+      };
+    } catch (err) {
+      console.warn("Supabase realtime skipped:", err);
+    }
+  }, []);
 
   const handleOpenDossier = (evaluation: BidEvaluation) => {
     const matchedTender =
@@ -163,12 +175,14 @@ export function RealtimeFeed({ initialEvaluations }: RealtimeFeedProps) {
       </AnimatePresence>
 
       {/* Evaluation Dossier Modal */}
-      <AiEvaluationModal
-        tender={selectedTender}
-        evaluation={selectedEvaluation}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {selectedTender && selectedEvaluation && (
+        <AiEvaluationModal
+          tender={selectedTender}
+          evaluation={selectedEvaluation}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

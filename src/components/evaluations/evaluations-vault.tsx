@@ -254,12 +254,14 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
       )}
 
       {/* AI Evaluation Modal */}
-      <AiEvaluationModal
-        tender={selectedTender}
-        evaluation={selectedEval}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {selectedTender && selectedEval && (
+        <AiEvaluationModal
+          tender={selectedTender}
+          evaluation={selectedEval}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

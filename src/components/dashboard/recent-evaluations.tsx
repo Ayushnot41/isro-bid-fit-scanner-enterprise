@@ -105,12 +105,14 @@ export function RecentEvaluations({ evaluations }: RecentEvaluationsProps) {
       </Card>
 
       {/* Detail Dossier Modal */}
-      <AiEvaluationModal
-        tender={selectedTender}
-        evaluation={selectedEval}
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-      />
+      {selectedTender && selectedEval && (
+        <AiEvaluationModal
+          tender={selectedTender}
+          evaluation={selectedEval}
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
     </>
   );
 }

@@ -57,10 +57,10 @@ export function AiEvaluationModal({
   const [showConsortium, setShowConsortium] = useState(false);
   const [showDsc, setShowDsc] = useState(false);
 
-  // Lock background scroll when modal is open
-  useLockBodyScroll(isOpen);
+  // Lock background scroll only when modal is genuinely active with valid props
+  useLockBodyScroll(Boolean(isOpen && tender && evaluation));
 
-  if (!tender || !evaluation) return null;
+  if (!isOpen || !tender || !evaluation) return null;
 
   const handleDownloadDossier = () => {
     generateEvaluationPDF(tender, evaluation, DEMO_VENDOR_PROFILE);
@@ -68,8 +68,7 @@ export function AiEvaluationModal({
 
   return (
     <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden selection:bg-emerald-500/30">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden selection:bg-emerald-500/30">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -522,7 +521,6 @@ export function AiEvaluationModal({
             onClose={() => setShowDsc(false)}
           />
         </div>
-      )}
     </AnimatePresence>
   );
 }
