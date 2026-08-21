@@ -14,6 +14,7 @@ import {
   Radio,
   ExternalLink,
   ShieldCheck,
+  Radar,
 } from "lucide-react";
 import { useClerk, UserButton } from "@clerk/nextjs";
 
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/dashboard", label: "Command Center", icon: LayoutDashboard },
   { href: "/tenders", label: "ISRO Tenders", icon: FileSearch, badge: "LIVE" },
   { href: "/evaluations", label: "Evaluations Vault", icon: ClipboardCheck },
+  { href: "/competitors", label: "Competitor Intel", icon: Radar, badge: "L1" },
   { href: "/profile", label: "Capability Matrix", icon: Sliders },
 ];
 
