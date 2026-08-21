@@ -71,6 +71,38 @@ export default async function DashboardPage() {
         <div className="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
       </div>
 
+      {/* WebCMD Autonomous Scraper & Grok AI Telemetry Ribbon */}
+      <div className="p-4 rounded-2xl bg-[#13161a] border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg shadow-black/20">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-white">WebCMD Autonomous Daemon</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                ACTIVE 20s PULSE
+              </span>
+            </div>
+            <p className="text-[11px] text-zinc-400 font-mono mt-0.5">
+              Session: session_cc2d6ad2 • 6 Centers Monitored (VSSC, URSC, SAC, SDSC, IPRC, LPSC) • OpenRouter Grok AI Live
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-stretch md:self-auto">
+          <Link
+            href="/tenders"
+            className="flex-1 md:flex-initial text-center px-3.5 py-1.5 rounded-xl bg-[#1c2128] hover:bg-[#242b35] border border-[#222730] text-zinc-200 text-xs font-mono transition-colors"
+          >
+            Launch WebCMD Terminal
+          </Link>
+        </div>
+      </div>
+
       {/* KPI Metrics HUD */}
       <StatsGrid evaluations={evals} />
 

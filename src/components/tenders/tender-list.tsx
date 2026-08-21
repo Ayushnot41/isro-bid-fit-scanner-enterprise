@@ -21,10 +21,12 @@ import {
   FileCheck2,
   Radio,
   Zap,
+  Terminal,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AiEvaluationModal } from "./ai-evaluation-modal";
 import { PdfUploader } from "./pdf-uploader";
+import { WebCmdTerminal } from "./webcmd-terminal";
 import { DEMO_VENDOR_PROFILE } from "@/lib/mock-data";
 import { evaluateBidFit } from "@/lib/evaluation/engine";
 
@@ -57,6 +59,7 @@ export function TenderList({ tenders: initialTenders, evaluations = [] }: Tender
   const [activeModalEvaluation, setActiveModalEvaluation] = useState<BidEvaluation | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(false);
 
   // Local evaluations map
   const [evaluationsMap, setEvaluationsMap] = useState<Record<string, BidEvaluation>>(() => {
@@ -213,6 +216,16 @@ export function TenderList({ tenders: initialTenders, evaluations = [] }: Tender
             >
               <FileCheck2 className="w-3.5 h-3.5 text-cyan-400" />
               {showUploader ? "Hide Uploader" : "Upload Custom RFP (PDF)"}
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowTerminal(!showTerminal)}
+              className="w-full sm:w-auto text-xs bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono"
+            >
+              <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+              {showTerminal ? "Hide WebCMD" : "WebCMD Console"}
             </Button>
 
             <Button
@@ -425,6 +438,13 @@ export function TenderList({ tenders: initialTenders, evaluations = [] }: Tender
         evaluation={activeModalEvaluation}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Autonomous WebCMD Mission Control Terminal */}
+      <WebCmdTerminal
+        isOpen={showTerminal}
+        onClose={() => setShowTerminal(false)}
+        onScrapeSuccess={handleScrape}
       />
     </div>
   );

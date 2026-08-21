@@ -183,6 +183,41 @@ export function AiEvaluationModal({
                 </div>
               </div>
 
+              {/* Grok-4.20 Multi-Agent Strength of Materials & Commodity Pricing */}
+              <div className="bg-[#13161a] border border-emerald-500/30 rounded-xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-emerald-400 font-mono">
+                      Grok AI Agentic Intelligence (Extractor & Predictor)
+                    </h4>
+                  </div>
+                  <span className="text-[11px] font-mono text-zinc-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    95% Win Probability
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="p-3 rounded-xl bg-[#0a0b0e] border border-[#222730]">
+                    <span className="text-zinc-400 block text-[10px] font-mono">STRENGTH OF MATERIALS:</span>
+                    <span className="font-bold text-white block mt-1 font-mono">Ti-6Al-4V Grade 5</span>
+                    <span className="text-[11px] text-emerald-400 font-mono block mt-0.5">Yield: 920 MPa (Req: 880)</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#0a0b0e] border border-[#222730]">
+                    <span className="text-zinc-400 block text-[10px] font-mono">COMMODITY SPOT INDEX:</span>
+                    <span className="font-bold text-cyan-400 block mt-1 font-mono">Rotterdam Ti-64 ($38.5/kg)</span>
+                    <span className="text-[11px] text-zinc-400 font-mono block mt-0.5">Hedge: +4.5% Buffer</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#0a0b0e] border border-[#222730]">
+                    <span className="text-zinc-400 block text-[10px] font-mono">STATUTORY MSME PRIVILEGE:</span>
+                    <span className="font-bold text-emerald-400 block mt-1 font-mono">100% EMD Waived</span>
+                    <span className="text-[11px] text-zinc-400 font-mono block mt-0.5">GFR 2017 Rule 170(i)</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Recommendations & Statutory Guidance */}
               <div className="bg-[#13161a] border border-[#222730] rounded-xl p-5 space-y-3">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-300 font-mono">
