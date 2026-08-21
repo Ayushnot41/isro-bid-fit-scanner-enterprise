@@ -8,6 +8,7 @@ const isProtectedRoute = createRouteMatcher([
   "/evaluations(.*)",
   "/competitors(.*)",
   "/profile(.*)",
+  "/vendor-profile(.*)",
 ]);
 
 // Routes for auth pages
