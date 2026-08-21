@@ -15,7 +15,6 @@ import {
   ExternalLink,
   ShieldCheck,
   Radar,
-  Building2,
 } from "lucide-react";
 import { useClerk, UserButton } from "@clerk/nextjs";
 
@@ -25,7 +24,6 @@ const navItems = [
   { href: "/evaluations", label: "Evaluations Vault", icon: ClipboardCheck },
   { href: "/competitors", label: "Competitor Intel", icon: Radar, badge: "L1" },
   { href: "/profile", label: "Capability Matrix", icon: Sliders },
-  { href: "/vendor-profile", label: "Vendor Profile", icon: Building2, badge: "NEW" },
 ];
 
 export function Sidebar() {
