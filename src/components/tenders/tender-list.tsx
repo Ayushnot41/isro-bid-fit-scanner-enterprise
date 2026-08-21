@@ -31,6 +31,7 @@ import { WebCmdTerminal } from "./webcmd-terminal";
 import { TenderCoPilotDrawer } from "./tender-copilot-drawer";
 import { DEMO_VENDOR_PROFILE } from "@/lib/mock-data";
 import { evaluateBidFit } from "@/lib/evaluation/engine";
+import { getWinProbability } from "@/lib/evaluation-utils";
 
 interface TenderListProps {
   tenders: ScrapedTender[];
@@ -396,9 +397,19 @@ export function TenderList({ tenders: initialTenders, evaluations = [] }: Tender
                         showPercentage
                       />
                       <div className="text-left">
-                        <p className="text-xs font-bold text-white font-mono">
-                          {Math.round(evalResult.final_bid_fit_score)}% FIT
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-bold text-white font-mono">
+                            {Math.round(evalResult.final_bid_fit_score)}% FIT
+                          </p>
+                          {(() => {
+                            const winProb = getWinProbability(evalResult.final_bid_fit_score);
+                            return (
+                              <span className={`px-1.5 py-0.5 rounded-[4px] text-[9px] font-bold font-mono border ${winProb.color}`} title={winProb.label}>
+                                {winProb.score}% WIN
+                              </span>
+                            );
+                          })()}
+                        </div>
                         <span className="text-[10px] font-mono text-emerald-400">
                           {evalResult.tender_mechanical_tolerances_met ? "✓ Tolerances Met" : "⚠ Deviation"}
                         </span>

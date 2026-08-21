@@ -61,6 +61,12 @@ export interface BidEvaluation {
     risk_factors?: string[];
     actionable_steps?: string[];
   };
+  required_documents?: {
+    id: string;
+    title: string;
+    description: string;
+    status: "pending" | "ready" | "not_applicable";
+  }[];
   recommendations: string[];
   evaluated_at: string;
 }

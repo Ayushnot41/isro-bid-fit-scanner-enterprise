@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { getScoreLabel } from "@/lib/utils";
 import type { BidEvaluation } from "@/lib/types/database";
 import { Sparkles, ShieldCheck, Wrench, FileCheck } from "lucide-react";
+import { getWinProbability } from "@/lib/evaluation-utils";
 
 interface ScoreCardProps {
   evaluation: BidEvaluation;
@@ -43,9 +44,19 @@ export function ScoreCard({ evaluation }: ScoreCardProps) {
         <div className="flex flex-col sm:flex-row items-center gap-6 mt-4">
           <div className="flex flex-col items-center flex-shrink-0">
             <ScoreGauge score={evaluation.final_bid_fit_score} size={110} strokeWidth={8} />
-            <span className="text-[10px] font-mono text-zinc-500 mt-1 uppercase tracking-wider">
-              ISRO BID FIT
-            </span>
+            <div className="flex flex-col items-center gap-1.5 mt-2">
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+                ISRO BID FIT
+              </span>
+              {(() => {
+                const winProb = getWinProbability(evaluation.final_bid_fit_score);
+                return (
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold font-mono border ${winProb.color}`} title={winProb.label}>
+                    {winProb.score}% WIN PROBABILITY
+                  </span>
+                );
+              })()}
+            </div>
           </div>
 
           <div className="flex-1 w-full min-w-0">
