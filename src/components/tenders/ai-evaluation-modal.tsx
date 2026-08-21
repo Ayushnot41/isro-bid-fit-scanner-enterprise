@@ -35,6 +35,7 @@ import { ConsortiumMatcher } from "./consortium-matcher";
 import { DscSigner } from "./dsc-signer";
 import { VernacularVoiceHud } from "@/components/ui/vernacular-voice-hud";
 import { CompetitorIntelligenceTab } from "./competitor-intelligence-tab";
+import { DocumentChecklistTab } from "./document-checklist-tab";
 
 interface AiEvaluationModalProps {
   tender: ScrapedTender | null;
@@ -43,7 +44,7 @@ interface AiEvaluationModalProps {
   onClose: () => void;
 }
 
-type ModalTab = "OVERVIEW" | "STRATEGY" | "COMPETITORS";
+type ModalTab = "OVERVIEW" | "STRATEGY" | "COMPETITORS" | "CHECKLIST";
 
 export function AiEvaluationModal({
   tender,
@@ -156,6 +157,18 @@ export function AiEvaluationModal({
                   <span className="px-1.5 py-0.2 rounded text-[9px] bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
                     L1 AUDIT
                   </span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab("CHECKLIST")}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold font-mono transition-all relative ${
+                    activeTab === "CHECKLIST"
+                      ? "bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm shadow-amber-500/10"
+                      : "text-zinc-400 hover:text-white hover:bg-[#181c22] border border-transparent"
+                  }`}
+                >
+                  <FileCheck className="w-3.5 h-3.5" />
+                  <span>Document Checklist</span>
                 </button>
               </div>
             </div>
@@ -427,6 +440,21 @@ export function AiEvaluationModal({
                 >
                   <CompetitorIntelligenceTab
                     tender={tender}
+                    vendorProfile={DEMO_VENDOR_PROFILE}
+                  />
+                </motion.div>
+              )}
+
+              {/* ── TAB 4: DOCUMENT CHECKLIST ─────────────────────────── */}
+              {activeTab === "CHECKLIST" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <DocumentChecklistTab
+                    tender={tender}
+                    evaluation={evaluation}
                     vendorProfile={DEMO_VENDOR_PROFILE}
                   />
                 </motion.div>

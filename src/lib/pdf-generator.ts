@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import type { BidEvaluation, ScrapedTender, VendorProfile } from "@/lib/types/database";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { getRequiredDocuments } from "@/lib/evaluation-utils";
 
 export function generateEvaluationPDF(
   tender: ScrapedTender,
@@ -314,14 +315,7 @@ export function generateEvaluationPDF(
   doc.text("5. MANDATORY SUBMISSION CHECKLIST FOR TECHNICAL ENVELOPE-1", margin, currentY);
 
   currentY += 2.5;
-  const recs = evaluation.recommendations?.length > 0
-    ? evaluation.recommendations
-    : [
-        "Include valid Udyam Registration Certificate with Bid Envelope-1 to claim 100% EMD waiver under GFR 170(i).",
-        "Attach CMM Calibration & Tolerance Repeatability reports demonstrating compliance with ±5 µm linear machining.",
-        "Provide AS9100D Rev D accreditation certificate and NABL-certified material test certificates (MTCs).",
-        "Prepare cleanroom assembly procedure and Stage-4 Radiographic / Ultrasonic NDT inspection plan.",
-      ];
+  const recs = getRequiredDocuments(evaluation, profile).map(d => d.description);
 
   recs.slice(0, 4).forEach((rec, idx) => {
     doc.setFont("helvetica", "bold");
