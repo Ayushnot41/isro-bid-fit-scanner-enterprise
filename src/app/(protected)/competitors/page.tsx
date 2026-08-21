@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -30,384 +30,51 @@ import {
   AlertCircle,
   BadgeAlert,
   ChevronRight,
+  RefreshCw,
+  Bell,
+  BellRing,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-// ── Types matching exact User Data Schema ────────────────────────────────────
-
-export interface VendorInsights {
-  total_bids: {
-    awarded: number;
-    pending: number;
-    tech_rejected: number;
-    lost: number;
-  };
-  total_value_cr: {
-    awarded: number;
-    pending: number;
-    tech_rejected: number;
-    lost: number;
-  };
-  win_rate_pct: number;
-  value_conversion_pct: number;
-}
-
-export interface TopOrganisation {
-  org_name: string;
-  center_code: "VSSC" | "URSC" | "SAC" | "IPRC" | "SDSC" | "LPSC" | string;
-  value_cr: number;
-  pct_share: number;
-}
-
-export interface OperatingCenter {
-  center_name: string;
-  lat: number;
-  lng: number;
-  value_cr: number;
-  pct_share: number;
-}
-
-export interface CompetitorComparison {
-  competitor_name: string;
-  competitor_won_value_cr: number;
-  this_company_won_value_cr: number;
-  others_won_value_cr: number;
-  wins_count: number;
-  shared_tenders_count: number;
-}
-
-export interface TenderHistoryEntry {
-  tender_id: string;
-  org_chain: string;
-  org_tags: string[];
-  title: string;
-  location: string;
-  stage_date_label: string;
-  est_cost_cr: number;
-  emd_amount: number;
-  l1_name: string | null;
-  l1_amount_cr: number | null;
-  l1_pct_below_estimate: number | null;
-  this_company_status: "Awarded" | "Bid placed" | "Pending" | "Lost" | "Tech Rejected";
-  this_company_amount_cr: number | null;
-  this_company_pct_below_estimate: number | null;
-}
-
-export interface VendorProfileData {
-  vendor_id: string;
-  vendor_name: string;
-  vendor_type: "MSME" | "Large Enterprise";
-  insights: VendorInsights;
-  top_organisations: TopOrganisation[];
-  operating_centers: OperatingCenter[];
-  competitors: CompetitorComparison[];
-  tender_history: TenderHistoryEntry[];
-}
-
-// ── User Provided Dataset ───────────────────────────────────────────────────
-
-const VENDORS_DATA: VendorProfileData[] = [
-  {
-    vendor_id: "aeroprecision-001",
-    vendor_name: "AeroPrecision Dynamics India Pvt. Ltd.",
-    vendor_type: "MSME",
-    insights: {
-      total_bids: { awarded: 4, pending: 6, tech_rejected: 2, lost: 8 },
-      total_value_cr: { awarded: 11.7, pending: 18.4, tech_rejected: 3.1, lost: 22.6 },
-      win_rate_pct: 20.0,
-      value_conversion_pct: 21.4,
-    },
-    top_organisations: [
-      { org_name: "Vikram Sarabhai Space Centre (VSSC)", center_code: "VSSC", value_cr: 6.4, pct_share: 54.7 },
-      { org_name: "U R Rao Satellite Centre (URSC)", center_code: "URSC", value_cr: 3.1, pct_share: 26.5 },
-      { org_name: "Space Applications Centre (SAC)", center_code: "SAC", value_cr: 1.4, pct_share: 12.0 },
-      { org_name: "ISRO Propulsion Complex (IPRC)", center_code: "IPRC", value_cr: 0.8, pct_share: 6.8 },
-    ],
-    operating_centers: [
-      { center_name: "VSSC, Thiruvananthapuram", lat: 8.5285, lng: 76.8747, value_cr: 6.4, pct_share: 54.7 },
-      { center_name: "URSC, Bengaluru", lat: 12.9629, lng: 77.6389, value_cr: 3.1, pct_share: 26.5 },
-      { center_name: "SAC, Ahmedabad", lat: 23.0395, lng: 72.5066, value_cr: 1.4, pct_share: 12.0 },
-      { center_name: "IPRC, Mahendragiri", lat: 8.3833, lng: 77.6333, value_cr: 0.8, pct_share: 6.8 },
-    ],
-    competitors: [
-      {
-        competitor_name: "Precision Aerostructures Ltd.",
-        competitor_won_value_cr: 18.6,
-        this_company_won_value_cr: 6.4,
-        others_won_value_cr: 9.2,
-        wins_count: 6,
-        shared_tenders_count: 11,
-      },
-      {
-        competitor_name: "Titan Aerospace Components Pvt. Ltd.",
-        competitor_won_value_cr: 12.3,
-        this_company_won_value_cr: 3.1,
-        others_won_value_cr: 7.8,
-        wins_count: 4,
-        shared_tenders_count: 8,
-      },
-      {
-        competitor_name: "Vaayu Precision Manufacturing",
-        competitor_won_value_cr: 9.1,
-        this_company_won_value_cr: 1.4,
-        others_won_value_cr: 5.6,
-        wins_count: 3,
-        shared_tenders_count: 6,
-      },
-      {
-        competitor_name: "Skyforge Engineering Works",
-        competitor_won_value_cr: 6.7,
-        this_company_won_value_cr: 0.8,
-        others_won_value_cr: 4.1,
-        wins_count: 2,
-        shared_tenders_count: 5,
-      },
-      {
-        competitor_name: "Nakshatra Alloys & Machining",
-        competitor_won_value_cr: 5.2,
-        this_company_won_value_cr: 0.0,
-        others_won_value_cr: 3.9,
-        wins_count: 2,
-        shared_tenders_count: 4,
-      },
-    ],
-    tender_history: [
-      {
-        tender_id: "VSSC/PUR/2026/T-089",
-        org_chain: "Vikram Sarabhai Space Centre (VSSC)",
-        org_tags: ["CPPP", "Technical BO", "Propulsion & Precision Machining"],
-        title: "Precision 5-Axis CNC Machining of Titanium Alloy PSLV-C60 Stage-4 Gimbal Brackets",
-        location: "VSSC, Thiruvananthapuram, Kerala",
-        stage_date_label: "Tech Evaluation 22 Aug 2026",
-        est_cost_cr: 3.20,
-        emd_amount: 640000,
-        l1_name: null,
-        l1_amount_cr: null,
-        l1_pct_below_estimate: null,
-        this_company_status: "Bid placed",
-        this_company_amount_cr: null,
-        this_company_pct_below_estimate: null,
-      },
-      {
-        tender_id: "URSC/MME/2026/T-104",
-        org_chain: "U R Rao Satellite Centre (URSC)",
-        org_tags: ["CPPP", "Technical BO", "Satellite Bus & Composite Structures"],
-        title: "Fabrication of Lightweight Honeycomb Carbon Fiber Bus Structure for Oceansat-4",
-        location: "URSC, Bengaluru, Karnataka",
-        stage_date_label: "Tech Evaluation 28 Sept 2026",
-        est_cost_cr: 8.50,
-        emd_amount: 1700000,
-        l1_name: null,
-        l1_amount_cr: null,
-        l1_pct_below_estimate: null,
-        this_company_status: "Bid placed",
-        this_company_amount_cr: null,
-        this_company_pct_below_estimate: null,
-      },
-      {
-        tender_id: "SAC/ELE/2026/T-047",
-        org_chain: "Space Applications Centre (SAC)",
-        org_tags: ["CPPP", "Technical BO", "RF, Microwave & Payload Electronics"],
-        title: "Supply of X-Band Solid State Power Amplifiers (SSPA) & Waveguide Assemblies for SAR",
-        location: "SAC, Ahmedabad, Gujarat",
-        stage_date_label: "Tech Evaluation 05 Oct 2026",
-        est_cost_cr: 4.50,
-        emd_amount: 900000,
-        l1_name: null,
-        l1_amount_cr: null,
-        l1_pct_below_estimate: null,
-        this_company_status: "Bid placed",
-        this_company_amount_cr: null,
-        this_company_pct_below_estimate: null,
-      },
-      {
-        tender_id: "IPRC/MEC/2026/T-052",
-        org_chain: "ISRO Propulsion Complex (IPRC)",
-        org_tags: ["CPPP", "Financial BO", "Cryogenics & Propulsion Systems"],
-        title: "Manufacture & Pressure Testing of Liquid Hydrogen (LH2) Cryogenic Regulating Valves",
-        location: "IPRC, Mahendragiri, Tamil Nadu",
-        stage_date_label: "Bid Opening 15 Oct 2026",
-        est_cost_cr: 6.20,
-        emd_amount: 1240000,
-        l1_name: null,
-        l1_amount_cr: null,
-        l1_pct_below_estimate: null,
-        this_company_status: "Bid placed",
-        this_company_amount_cr: null,
-        this_company_pct_below_estimate: null,
-      },
-      {
-        tender_id: "VSSC/PUR/2025/T-041",
-        org_chain: "Vikram Sarabhai Space Centre (VSSC)",
-        org_tags: ["CPPP", "Technical BO", "Propulsion & Precision Machining"],
-        title: "CNC Machining of Aluminium Alloy Interstage Adapter Rings for PSLV",
-        location: "VSSC, Thiruvananthapuram, Kerala",
-        stage_date_label: "Awarded 12 Mar 2026",
-        est_cost_cr: 2.10,
-        emd_amount: 420000,
-        l1_name: "AeroPrecision Dynamics India Pvt. Ltd.",
-        l1_amount_cr: 1.87,
-        l1_pct_below_estimate: 10.9,
-        this_company_status: "Awarded",
-        this_company_amount_cr: 1.87,
-        this_company_pct_below_estimate: 10.9,
-      },
-      {
-        tender_id: "URSC/MME/2025/T-078",
-        org_chain: "U R Rao Satellite Centre (URSC)",
-        org_tags: ["CPPP", "Technical BO", "Satellite Bus & Composite Structures"],
-        title: "Supply of Carbon Fiber Reinforced Polymer (CFRP) Panels for Bus Structure",
-        location: "URSC, Bengaluru, Karnataka",
-        stage_date_label: "Awarded 03 Feb 2026",
-        est_cost_cr: 3.80,
-        emd_amount: 760000,
-        l1_name: "Precision Aerostructures Ltd.",
-        l1_amount_cr: 3.35,
-        l1_pct_below_estimate: 11.8,
-        this_company_status: "Lost",
-        this_company_amount_cr: 3.62,
-        this_company_pct_below_estimate: 4.7,
-      },
-      {
-        tender_id: "SAC/ELE/2025/T-033",
-        org_chain: "Space Applications Centre (SAC)",
-        org_tags: ["CPPP", "Technical BO", "RF, Microwave & Payload Electronics"],
-        title: "Manufacture of Waveguide Filter Assemblies for Ku-Band Transponders",
-        location: "SAC, Ahmedabad, Gujarat",
-        stage_date_label: "Tech Rejected 18 Jan 2026",
-        est_cost_cr: 1.95,
-        emd_amount: 390000,
-        l1_name: "Titan Aerospace Components Pvt. Ltd.",
-        l1_amount_cr: 1.71,
-        l1_pct_below_estimate: 12.3,
-        this_company_status: "Tech Rejected",
-        this_company_amount_cr: null,
-        this_company_pct_below_estimate: null,
-      },
-      {
-        tender_id: "IPRC/MEC/2025/T-029",
-        org_chain: "ISRO Propulsion Complex (IPRC)",
-        org_tags: ["CPPP", "Financial BO", "Cryogenics & Propulsion Systems"],
-        title: "Fabrication of Stainless Steel Cryogenic Transfer Lines",
-        location: "IPRC, Mahendragiri, Tamil Nadu",
-        stage_date_label: "Awarded 27 Dec 2025",
-        est_cost_cr: 2.60,
-        emd_amount: 520000,
-        l1_name: "AeroPrecision Dynamics India Pvt. Ltd.",
-        l1_amount_cr: 2.31,
-        l1_pct_below_estimate: 11.2,
-        this_company_status: "Awarded",
-        this_company_amount_cr: 2.31,
-        this_company_pct_below_estimate: 11.2,
-      },
-      {
-        tender_id: "SDSC/MEC/2025/T-061",
-        org_chain: "Satish Dhawan Space Centre (SDSC SHAR)",
-        org_tags: ["CPPP", "Technical BO", "Launch Vehicle Structures"],
-        title: "Precision Machining of Launch Pad Umbilical Mast Fittings",
-        location: "SDSC SHAR, Sriharikota, Andhra Pradesh",
-        stage_date_label: "Lost 14 Nov 2025",
-        est_cost_cr: 5.40,
-        emd_amount: 1080000,
-        l1_name: "Vaayu Precision Manufacturing",
-        l1_amount_cr: 4.78,
-        l1_pct_below_estimate: 11.5,
-        this_company_status: "Lost",
-        this_company_amount_cr: 5.02,
-        this_company_pct_below_estimate: 7.0,
-      },
-      {
-        tender_id: "LPSC/CHM/2025/T-018",
-        org_chain: "Liquid Propulsion Systems Centre (LPSC)",
-        org_tags: ["CPPP", "Technical BO", "Propulsion & Chemical Systems"],
-        title: "Supply of Titanium Alloy Injector Head Assemblies for Vikas Engine",
-        location: "LPSC, Valiamala, Kerala",
-        stage_date_label: "Pending — Financial BO 30 Aug 2026",
-        est_cost_cr: 4.10,
-        emd_amount: 820000,
-        l1_name: null,
-        l1_amount_cr: null,
-        l1_pct_below_estimate: null,
-        this_company_status: "Pending",
-        this_company_amount_cr: null,
-        this_company_pct_below_estimate: null,
-      },
-    ],
-  },
-
-  {
-    vendor_id: "precision-aerostructures-002",
-    vendor_name: "Precision Aerostructures Ltd.",
-    vendor_type: "Large Enterprise",
-    insights: {
-      total_bids: { awarded: 22, pending: 9, tech_rejected: 4, lost: 17 },
-      total_value_cr: { awarded: 96.4, pending: 41.2, tech_rejected: 9.8, lost: 62.7 },
-      win_rate_pct: 43.1,
-      value_conversion_pct: 44.7,
-    },
-    top_organisations: [
-      { org_name: "U R Rao Satellite Centre (URSC)", center_code: "URSC", value_cr: 38.6, pct_share: 40.0 },
-      { org_name: "Vikram Sarabhai Space Centre (VSSC)", center_code: "VSSC", value_cr: 27.1, pct_share: 28.1 },
-      { org_name: "Space Applications Centre (SAC)", center_code: "SAC", value_cr: 18.4, pct_share: 19.1 },
-      { org_name: "Satish Dhawan Space Centre (SDSC SHAR)", center_code: "SDSC", value_cr: 12.3, pct_share: 12.8 },
-    ],
-    operating_centers: [
-      { center_name: "URSC, Bengaluru", lat: 12.9629, lng: 77.6389, value_cr: 38.6, pct_share: 40.0 },
-      { center_name: "VSSC, Thiruvananthapuram", lat: 8.5285, lng: 76.8747, value_cr: 27.1, pct_share: 28.1 },
-      { center_name: "SAC, Ahmedabad", lat: 23.0395, lng: 72.5066, value_cr: 18.4, pct_share: 19.1 },
-      { center_name: "SDSC SHAR, Sriharikota", lat: 13.7199, lng: 80.2304, value_cr: 12.3, pct_share: 12.8 },
-    ],
-    competitors: [
-      {
-        competitor_name: "AeroPrecision Dynamics India Pvt. Ltd.",
-        competitor_won_value_cr: 6.4,
-        this_company_won_value_cr: 18.6,
-        others_won_value_cr: 9.2,
-        wins_count: 4,
-        shared_tenders_count: 11,
-      },
-      {
-        competitor_name: "Titan Aerospace Components Pvt. Ltd.",
-        competitor_won_value_cr: 22.1,
-        this_company_won_value_cr: 31.4,
-        others_won_value_cr: 14.6,
-        wins_count: 9,
-        shared_tenders_count: 19,
-      },
-    ],
-    tender_history: [
-      {
-        tender_id: "URSC/MME/2025/T-078",
-        org_chain: "U R Rao Satellite Centre (URSC)",
-        org_tags: ["CPPP", "Technical BO", "Satellite Bus & Composite Structures"],
-        title: "Supply of Carbon Fiber Reinforced Polymer (CFRP) Panels for Bus Structure",
-        location: "URSC, Bengaluru, Karnataka",
-        stage_date_label: "Awarded 03 Feb 2026",
-        est_cost_cr: 3.80,
-        emd_amount: 760000,
-        l1_name: "Precision Aerostructures Ltd.",
-        l1_amount_cr: 3.35,
-        l1_pct_below_estimate: 11.8,
-        this_company_status: "Awarded",
-        this_company_amount_cr: 3.35,
-        this_company_pct_below_estimate: 11.8,
-      },
-    ],
-  },
-];
+import type { CompetitorVendorProfile } from "@/lib/intelligence/competitor-service";
+import { SEED_COMPETITOR_VENDORS } from "@/lib/intelligence/competitor-service";
 
 type TenderStatusFilter = "ALL" | "AWARDED" | "BID_PLACED" | "PENDING" | "LOST" | "TECH_REJECTED";
 
 export default function CompetitorsPage() {
+  const [vendorsList, setVendorsList] = useState<CompetitorVendorProfile[]>(SEED_COMPETITOR_VENDORS);
   const [selectedVendorId, setSelectedVendorId] = useState<string>("aeroprecision-001");
   const [metricMode, setMetricMode] = useState<"VALUE" | "COUNT">("VALUE");
   const [tenderFilter, setTenderFilter] = useState<TenderStatusFilter>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isTracking, setIsTracking] = useState(false);
+  const [trackingLoading, setTrackingLoading] = useState(false);
+
+  // Fetch live competitor dataset from backend API
+  useEffect(() => {
+    async function loadBackendData() {
+      try {
+        setIsLoading(true);
+        const res = await fetch("/api/competitors");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            setVendorsList(json.data);
+          }
+        }
+      } catch (err) {
+        console.warn("Using fallback local dataset:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadBackendData();
+  }, []);
 
   const activeVendor = useMemo(() => {
-    return VENDORS_DATA.find((v) => v.vendor_id === selectedVendorId) || VENDORS_DATA[0];
-  }, [selectedVendorId]);
+    return vendorsList.find((v) => v.vendor_id === selectedVendorId) || vendorsList[0];
+  }, [vendorsList, selectedVendorId]);
 
   const totalBidsCount = useMemo(() => {
     const b = activeVendor.insights.total_bids;
@@ -453,6 +120,30 @@ export default function CompetitorsPage() {
     };
   }, [activeVendor]);
 
+  const handleToggleTrack = async () => {
+    try {
+      setTrackingLoading(true);
+      const res = await fetch("/api/competitors/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          vendor_id: activeVendor.vendor_id,
+          vendor_name: activeVendor.vendor_name,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setIsTracking(data.tracked);
+      } else {
+        setIsTracking((v) => !v);
+      }
+    } catch {
+      setIsTracking((v) => !v);
+    } finally {
+      setTrackingLoading(false);
+    }
+  };
+
   const handleExportCSV = () => {
     window.location.href = "/api/evaluations/export";
   };
@@ -472,7 +163,7 @@ export default function CompetitorsPage() {
                 Sample Data
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                CPPP / eproc.isro.gov.in Archive
+                REST API Live Connected
               </span>
             </div>
             <p className="text-zinc-400 text-xs sm:text-sm font-sans">
@@ -490,7 +181,7 @@ export default function CompetitorsPage() {
                 onChange={(e) => setSelectedVendorId(e.target.value)}
                 className="bg-transparent border-0 text-xs font-mono text-white focus:outline-none cursor-pointer pr-2"
               >
-                {VENDORS_DATA.map((v) => (
+                {vendorsList.map((v) => (
                   <option key={v.vendor_id} value={v.vendor_id} className="bg-[#0e1115] text-white">
                     {v.vendor_name} ({v.vendor_type})
                   </option>
@@ -551,18 +242,35 @@ export default function CompetitorsPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 shrink-0 sm:border-l sm:border-[#222730] sm:pl-4 font-mono text-xs">
-            <div>
-              <span className="text-[10px] text-zinc-500 block uppercase">Win Rate</span>
-              <span className="text-emerald-400 font-bold text-sm">{activeVendor.insights.win_rate_pct}%</span>
-            </div>
-            <div>
-              <span className="text-[10px] text-zinc-500 block uppercase">Value Conversion</span>
-              <span className="text-cyan-400 font-bold text-sm">{activeVendor.insights.value_conversion_pct}%</span>
-            </div>
-            <div>
-              <span className="text-[10px] text-zinc-500 block uppercase">Awarded Volume</span>
-              <span className="text-white font-bold text-sm">₹{activeVendor.insights.total_value_cr.awarded} Cr</span>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={trackingLoading}
+              onClick={handleToggleTrack}
+              className={`text-xs flex items-center gap-1.5 transition-all ${
+                isTracking
+                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                  : "hover:bg-[#1a2027]"
+              }`}
+            >
+              {isTracking ? <BellRing className="w-3.5 h-3.5 text-emerald-400" /> : <Bell className="w-3.5 h-3.5 text-zinc-400" />}
+              <span>{isTracking ? "Watching" : "Watch Competitor"}</span>
+            </Button>
+
+            <div className="flex items-center gap-4 shrink-0 sm:border-l sm:border-[#222730] sm:pl-4 font-mono text-xs">
+              <div>
+                <span className="text-[10px] text-zinc-500 block uppercase">Win Rate</span>
+                <span className="text-emerald-400 font-bold text-sm">{activeVendor.insights.win_rate_pct}%</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-zinc-500 block uppercase">Value Conversion</span>
+                <span className="text-cyan-400 font-bold text-sm">{activeVendor.insights.value_conversion_pct}%</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-zinc-500 block uppercase">Awarded Volume</span>
+                <span className="text-white font-bold text-sm">₹{activeVendor.insights.total_value_cr.awarded} Cr</span>
+              </div>
             </div>
           </div>
         </div>
