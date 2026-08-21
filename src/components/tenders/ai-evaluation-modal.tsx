@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { BidEvaluation, ScrapedTender } from "@/lib/types/database";
 import { ScoreGauge } from "@/components/ui/score-gauge";
@@ -16,10 +17,17 @@ import {
   Radio,
   FileCheck,
   Sparkles,
+  Box,
+  Handshake,
+  KeyRound,
 } from "lucide-react";
 import DynamicStreamingText from "@/components/ui/dynamic-streaming-text";
 import { DEMO_VENDOR_PROFILE } from "@/lib/mock-data";
 import { generateEvaluationPDF } from "@/lib/pdf-generator";
+import { Cad3dViewer } from "./cad-3d-viewer";
+import { ConsortiumMatcher } from "./consortium-matcher";
+import { DscSigner } from "./dsc-signer";
+import { VernacularVoiceHud } from "@/components/ui/vernacular-voice-hud";
 
 interface AiEvaluationModalProps {
   tender: ScrapedTender | null;
@@ -34,6 +42,10 @@ export function AiEvaluationModal({
   isOpen,
   onClose,
 }: AiEvaluationModalProps) {
+  const [showCad, setShowCad] = useState(false);
+  const [showConsortium, setShowConsortium] = useState(false);
+  const [showDsc, setShowDsc] = useState(false);
+
   if (!tender || !evaluation) return null;
 
   const handleDownloadDossier = () => {
@@ -137,6 +149,13 @@ export function AiEvaluationModal({
                   </div>
                 </div>
               </div>
+
+              {/* Vernacular Voice HUD Audio Briefing */}
+              <VernacularVoiceHud
+                tenderTitle={tender.title}
+                winProbability={evaluation.final_bid_fit_score}
+                emdSavedLakhs={(tender.emd_amount_inr || 640000) / 100000}
+              />
 
               {/* Dynamic Streaming Text AI Synthesis */}
               <div className="bg-[#13161a] border border-[#222730] rounded-xl p-5">
@@ -283,6 +302,44 @@ export function AiEvaluationModal({
                   </li>
                 </ul>
               </div>
+              {/* Advanced Aerospace Tools Ribbon */}
+              <div className="p-4 rounded-xl bg-[#0a0b0e] border border-cyan-500/30 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <span className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                    Advanced Aerospace Bid Accelerators:
+                  </span>
+                  <span className="text-[10px] text-zinc-400 font-mono block mt-0.5">
+                    3D Model Inspector, Consortium Matcher & Class-3 Digital Signer
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => setShowCad(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono text-xs transition-colors"
+                  >
+                    <Box className="w-3.5 h-3.5" />
+                    <span>3D CAD Inspector</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowConsortium(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono text-xs transition-colors"
+                  >
+                    <Handshake className="w-3.5 h-3.5" />
+                    <span>JV Consortium</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowDsc(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-xs transition-colors"
+                  >
+                    <KeyRound className="w-3.5 h-3.5" />
+                    <span>Sign with DSC</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Modal Footer with Direct PDF Download & Print */}
@@ -322,6 +379,29 @@ export function AiEvaluationModal({
               </div>
             </div>
           </motion.div>
+
+          {/* 3D CAD Inspector Modal */}
+          <Cad3dViewer
+            partName={tender.title}
+            alloyGrade="Ti-6Al-4V Grade 5 (Aerospace Spec)"
+            tolerancesMet={Boolean(evaluation.tender_mechanical_tolerances_met)}
+            isOpen={showCad}
+            onClose={() => setShowCad(false)}
+          />
+
+          {/* Aerospace Consortium Matcher */}
+          <ConsortiumMatcher
+            tenderTitle={tender.title}
+            isOpen={showConsortium}
+            onClose={() => setShowConsortium(false)}
+          />
+
+          {/* Class-3 DSC Signer */}
+          <DscSigner
+            tenderReference={tender.reference_number}
+            isOpen={showDsc}
+            onClose={() => setShowDsc(false)}
+          />
         </div>
       )}
     </AnimatePresence>
