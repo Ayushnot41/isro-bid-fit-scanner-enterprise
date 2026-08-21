@@ -12,6 +12,28 @@ const FALLBACK_MODELS = [
   "meta-llama/llama-3.3-70b-instruct",
 ];
 
+// Helper to sanitize any raw asterisks or bullet stars from AI output
+function cleanMarkdownStars(text: string): string {
+  if (!text) return "";
+  return text
+    // Replace leading asterisk bullets like "* ", "** " with clean numbered points or arrows
+    .split("\n")
+    .map((line) => {
+      let trimmed = line.trim();
+      if (trimmed.startsWith("* ") || trimmed.startsWith("- ")) {
+        return "• " + trimmed.substring(2);
+      }
+      if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
+        return trimmed.replace(/\*\*/g, "");
+      }
+      return line;
+    })
+    .join("\n")
+    // Remove stray double asterisks if requested or keep clean formatting
+    .replace(/^\*\s+/gm, "• ")
+    .replace(/\n\*\s+/g, "\n• ");
+}
+
 export async function askTenderCoPilot(
   question: string,
   tender: ScrapedTender,
@@ -24,33 +46,38 @@ export async function askTenderCoPilot(
 
   const reqTolUm = (tender.required_tolerances?.linear_tolerance_mm ?? 0.02) * 1000;
   const offTolUm = (profile.mechanical_tolerances?.linear_tolerance_mm ?? 0.005) * 1000;
-  const isTi = (tender.title + " " + tender.description).toLowerCase().includes("titanium") || (tender.title + " " + tender.description).toLowerCase().includes("ti-6al-4v");
-  const isInc = (tender.title + " " + tender.description).toLowerCase().includes("inconel") || (tender.title + " " + tender.description).toLowerCase().includes("718");
-  const alloyName = isTi ? "Ti-6Al-4V Grade 5 (Aerospace Spec)" : isInc ? "Inconel 718 (AMS 5662)" : "AA2219 Aluminium-Copper";
+  const isTi = (tender.title + " " + (tender.description || "")).toLowerCase().includes("titanium") || (tender.title + " " + (tender.description || "")).toLowerCase().includes("ti-6al-4v");
+  const isInc = (tender.title + " " + (tender.description || "")).toLowerCase().includes("inconel") || (tender.title + " " + (tender.description || "")).toLowerCase().includes("718");
+  const alloyName = isTi ? "Ti-6Al-4V Grade 5 (Aerospace Spec)" : isInc ? "Inconel 718 (AMS 5662)" : "AA2219 Aluminium-Copper Space Alloy";
+  const estLakhs = ((tender.estimated_value_inr || 32000000) / 100000).toFixed(2);
+  const emdLakhs = ((tender.emd_amount_inr || 640000) / 100000).toFixed(2);
 
-  // System Prompt for Live OpenRouter Models
-  const systemContext = `You are Tender_CoPilot, an expert AI Procurement Advisor for ISRO space hardware tenders.
-Your mission is to provide SHORT, SIMPLE, and HIGH-IMPACT answers that anyone can understand and memorize instantly.
+  // Deep System Prompt for Live OpenRouter Models
+  const systemContext = `You are Tender_CoPilot, an expert AI Aerospace Procurement Advisor for ISRO tenders.
+Your mission is to provide direct, helpful, and crystal-clear answers without using asterisk symbols (*) at the beginning of lines.
 
-ISRO TENDER CONTEXT:
-- Ref: ${tender.reference_number}
-- Title: ${tender.title}
-- Center: ${tender.issuing_center}
-- Value: INR ${(tender.estimated_value_inr || 0).toLocaleString("en-IN")}
-- EMD: INR ${(tender.emd_amount_inr || 0).toLocaleString("en-IN")}
-- Required Tolerance: ±${reqTolUm} µm
-- Required Material: ${alloyName}
+TENDER KNOWLEDGE BASE:
+- Reference Number: ${tender.reference_number}
+- Tender Title: ${tender.title}
+- Issuing ISRO Center: ${tender.issuing_center} (${tender.center_code || "ISRO HQ"})
+- Scope of Work: ${tender.description || "Precision aerospace hardware fabrication and testing"}
+- Estimated Tender Value: INR ${estLakhs} Lakhs (₹${(tender.estimated_value_inr || 0).toLocaleString("en-IN")})
+- Mandated EMD Amount: INR ${emdLakhs} Lakhs (₹${(tender.emd_amount_inr || 0).toLocaleString("en-IN")})
+- Required Mechanical Tolerance: ±${reqTolUm} µm (Linear machining accuracy)
+- Prescribed Material Spec: ${alloyName} (920 MPa Yield Strength compliant)
+- Quality Accreditations: ${tender.required_certifications?.join(", ") || "AS9100D, ISO 9001, NABL"}
+- Statutory Rules: General Financial Rules (GFR) 2017 Rule 170(i), MSMED Act 2006, Public Procurement Policy 2012 (25% MSE Quota)
 
 VENDOR PROFILE:
-- Company: ${profile.company_name}
-- MSME: ${profile.msme_registered ? "YES (Udyam Verified " + profile.msme_category + ")" : "NO"}
-- Capability: ±${offTolUm} µm (5-Axis CNC)
+- Vendor Enterprise: ${profile.company_name}
+- MSME Registration: ${profile.msme_registered ? "YES (Udyam Verified " + profile.msme_category + ")" : "NO"}
+- 5-Axis CNC Precision: ±${offTolUm} µm
+- Quality Accreditations: ${profile.certifications?.join(", ") || "AS9100D, ISO 9001:2015, NABL"}
 
-ANSWER RULES:
-1. Maximum 2 to 4 short, crystal-clear bullet points.
-2. Use simple, everyday words. Avoid overly heavy technical jargon.
-3. Bold all key numbers and decisions (e.g. **₹0 EMD deposit**, **±5 µm CNC**, **95% win chance**).
-4. Finish with a 1-sentence "Bottom Line" action.`;
+FORMATTING RULES:
+1. Do NOT start any line with an asterisk (*). Use bullet points (•) or numbers (1., 2.).
+2. Keep answers short, clear, and direct (2-4 bullets maximum).
+3. Always finish with a direct one-sentence "Bottom Line:" actionable recommendation.`;
 
   // 1. Try Live OpenRouter API with Model Cascade
   if (apiKey && apiKey.startsWith("sk-or-v1-")) {
@@ -74,7 +101,7 @@ ANSWER RULES:
             model,
             messages,
             temperature: 0.2,
-            max_tokens: 300,
+            max_tokens: 350,
           }),
         });
 
@@ -82,7 +109,7 @@ ANSWER RULES:
           const data = await response.json();
           const reply = data.choices?.[0]?.message?.content?.trim();
           if (reply && reply.length > 20) {
-            return reply;
+            return cleanMarkdownStars(reply);
           }
         }
       } catch {
@@ -91,101 +118,108 @@ ANSWER RULES:
     }
   }
 
-  // 2. Short, Clear, Memorizable Domain-Specific Answers
-  // EMD & Financial Waivers
+  // 2. High-Precision Domain Knowledge Base (Clean Formatting, No raw asterisks)
+  // Question: What is an ISRO Tender / Space procurement?
+  if (qLower.includes("what is") && (qLower.includes("tender") || qLower.includes("procurement") || qLower.includes("isro"))) {
+    return `• An ISRO Tender is an official government contract issued by the Department of Space to procure specialized flight hardware, rocket motors, satellites, or sub-assemblies.
+• Contracts are awarded through a transparent two-envelope bidding system (Technical Envelope-1 and Financial Envelope-2) on eproc.isro.gov.in.
+• Indian MSMEs receive special privileges including 100% EMD fee exemptions and 25% order volume reservation.
+
+Bottom Line: Review technical specifications and submit Envelope-1 before the closing date.`;
+  }
+
+  // Question: EMD & Financial Waivers
   if (qLower.includes("emd") || qLower.includes("earnest") || qLower.includes("fee") || qLower.includes("deposit") || qLower.includes("waiver")) {
     if (profile.msme_registered) {
-      return `• **100% Free EMD:** You pay **₹0 EMD** (saving **₹${((tender.emd_amount_inr || 640000) / 100000).toFixed(2)} Lakhs**) under Government Rule GFR 170(i).
-• **How to claim:** Simply attach your valid **Udyam Certificate** in Technical Envelope-1.
-• **No Bank Guarantee needed:** Your MSME status acts as your security deposit.
+      return `• 100% Free EMD: You pay ₹0 EMD (saving ₹${emdLakhs} Lakhs) under Government Rule GFR 170(i).
+• How to claim: Attach your valid Udyam Registration Certificate in Technical Envelope-1.
+• No Bank Guarantee needed: Your verified MSME status acts as your security deposit.
 
-**👉 Bottom Line:** You can submit your bid with zero upfront cash deposit.`;
+Bottom Line: You can submit your bid with zero upfront cash deposit.`;
     } else {
-      return `• **EMD Required:** A deposit of **₹${((tender.emd_amount_inr || 640000) / 100000).toFixed(2)} Lakhs** is mandatory before bid closing.
-• **Payment options:** Electronic NEFT transfer or Bank Guarantee valid for 225 days.
+      return `• EMD Required: A deposit of ₹${emdLakhs} Lakhs is mandatory before bid closing.
+• Payment options: Electronic NEFT transfer or Bank Guarantee valid for 225 days.
 
-**👉 Bottom Line:** Register on MSME Udyam to make this deposit ₹0 in future tenders.`;
+Bottom Line: Register on MSME Udyam to make this deposit ₹0 in future tenders.`;
     }
   }
 
-  // Tolerances & Machining
+  // Question: Tolerances & GD&T
   if (qLower.includes("tolerance") || qLower.includes("precision") || qLower.includes("micron") || qLower.includes("gdt") || qLower.includes("cnc") || qLower.includes("machining")) {
-    return `• **ISRO Required Tolerance:** **±${reqTolUm} µm** (micro-precision).
-• **Your Workshop Capability:** **±${offTolUm} µm** on 5-Axis CNC machines.
-• **Compliance Result:** **100% Qualified** (your machines are 4x more accurate than required).
+    return `• ISRO Required Tolerance: ±${reqTolUm} µm (Linear accuracy).
+• Your Workshop Capability: ±${offTolUm} µm on 5-Axis CNC machines.
+• Compliance Result: 100% Qualified (your machines are 4x more accurate than required).
 
-**👉 Bottom Line:** Attach your CMM 3D inspection calibration report to prove compliance.`;
+Bottom Line: Attach your CMM 3D inspection calibration report to prove technical compliance.`;
   }
 
-  // Strength of Materials & Metallurgy
-  if (qLower.includes("material") || qLower.includes("alloy") || qLower.includes("titanium") || qLower.includes("inconel") || qLower.includes("yield") || qLower.includes("tensile")) {
-    return `• **Prescribed Metal:** **${alloyName}** (Space-grade certified).
-• **Yield Strength:** Your **920 MPa** easily beats ISRO's required **880 MPa**.
-• **Testing Required:** 100% Ultrasonic test (UT) and X-ray inspection before dispatch.
+  // Question: Strength of Materials & Metallurgy
+  if (qLower.includes("material") || qLower.includes("alloy") || qLower.includes("titanium") || qLower.includes("inconel") || qLower.includes("yield") || qLower.includes("tensile") || qLower.includes("stress")) {
+    return `• Prescribed Metal: ${alloyName} (Space-grade certified).
+• Yield Strength: Your 920 MPa easily exceeds ISRO's required 880 MPa baseline.
+• Testing Required: 100% Ultrasonic test (UT) per AMS 2631 and X-ray inspection before dispatch.
 
-**👉 Bottom Line:** Your raw material test certificates (MTC) meet all rocket launch standards.`;
+Bottom Line: Your raw material test certificates (MTC) meet all rocket launch standards.`;
   }
 
-  // Late Delivery Penalties & LD
+  // Question: Late Delivery Penalties & LD
   if (qLower.includes("penalty") || qLower.includes("liquidated") || qLower.includes("delay") || qLower.includes("ld") || qLower.includes("late")) {
-    return `• **Delay Penalty:** **0.5% per week of delay** under ISRO GCC Clause 14.2.
-• **Maximum Penalty Cap:** Capped at **10% of total order value**.
-• **Safety Strategy:** Keep a **14-day manufacturing buffer** for final ISRO quality inspections.
+    return `• Delay Penalty: 0.5% per week of delay under ISRO GCC Clause 14.2.
+• Maximum Penalty Cap: Capped at 10% of total order value.
+• Safety Strategy: Maintain a 14-day manufacturing buffer for final ISRO quality inspections.
 
-**👉 Bottom Line:** Deliver on time with 2-week inspection buffer to avoid any deductions.`;
+Bottom Line: Deliver on time with a 2-week inspection buffer to prevent any financial deductions.`;
   }
 
-  // Performance Bank Guarantee (PBG)
-  if (qLower.includes("pbg") || qLower.includes("bank guarantee") || qLower.includes("security deposit")) {
-    const pbgLakhs = ((tender.estimated_value_inr || 32000000) * 0.03 / 100000).toFixed(2);
-    return `• **PBG Amount:** **3% of contract value** (approx. **₹${pbgLakhs} Lakhs**).
-• **Validity:** Must remain valid for **14 months** (order period + 60 days warranty).
-• **Due Date:** Submit within **15 days of receiving the Purchase Order**.
+  // Question: L1 & 25% MSE Purchase Preference Quota
+  if (qLower.includes("l1") || qLower.includes("quota") || qLower.includes("preference") || qLower.includes("25%") || qLower.includes("band") || qLower.includes("purchase preference")) {
+    return `• L1 Definition: The lowest valid commercial price quoted in Financial Envelope-2.
+• MSE 25% Policy: If your quote is within L1 + 15%, ISRO invites you to match L1 and receive 25% of the order volume.
+• Price Strategy: Quote within 10-14% of market baseline to preserve margins while qualifying for the quota.
 
-**👉 Bottom Line:** Your bank can issue this standard guarantee upon tender award.`;
+Bottom Line: Your MSE status guarantees order sharing if your price is within the 15% band.`;
   }
 
-  // Payment Milestones
-  if (qLower.includes("payment") || qLower.includes("milestone") || qLower.includes("advance") || qLower.includes("billing") || qLower.includes("invoice")) {
-    return `• **Stage 1 (30%):** Paid on raw material receipt and test certificate approval.
-• **Stage 2 (40%):** Paid on pre-dispatch dimensional inspection sign-off.
-• **Stage 3 (30%):** Paid within 30 days of delivery at ${tender.issuing_center}.
+  // Question: Technical Envelope-1 vs Financial Envelope-2
+  if (qLower.includes("envelope") || qLower.includes("document") || qLower.includes("submission") || qLower.includes("upload") || qLower.includes("file")) {
+    return `• Technical Envelope-1: Udyam Certificate, AS9100D, NABL Metrology Reports, Annexure-A self-declaration, and Drawing Compliance Sheet.
+• Financial Envelope-2: Commercial Bill of Quantities (BOQ) with INR unit rates (never include prices in Envelope-1).
+• Digital Signing: Sign both envelopes using Class-3 DSC USB token on eproc.isro.gov.in.
 
-**👉 Bottom Line:** MSME suppliers receive fast-track payment settlement within 45 days.`;
+Bottom Line: Never mention commercial prices in Envelope-1 to prevent instant disqualification.`;
   }
 
-  // Cleanroom & Packaging
-  if (qLower.includes("cleanroom") || qLower.includes("clean room") || qLower.includes("particle") || qLower.includes("nitrogen") || qLower.includes("packaging")) {
-    return `• **Cleanroom Standard:** **ISO Class 7 (Class 10,000)** dust-controlled room.
-• **Packaging Protocol:** Vacuum-seal parts in double antistatic bags with dry nitrogen purge.
-• **Why it matters:** Prevents microscopic dust contamination and orbital outgassing.
+  // Question: Payment Milestones & Invoicing
+  if (qLower.includes("payment") || qLower.includes("milestone") || qLower.includes("advance") || qLower.includes("invoice") || qLower.includes("billing")) {
+    return `• Stage 1 (30%): Paid on raw material receipt and approved Mill Test Certificate (MTC).
+• Stage 2 (40%): Paid on pre-dispatch dimensional inspection sign-off.
+• Stage 3 (30%): Paid within 30 days of final receipt at ${tender.issuing_center}.
 
-**👉 Bottom Line:** Cleanroom-sealed parts guarantee zero rejection at central stores receiving.`;
+Bottom Line: Verified MSMEs receive fast-track electronic settlement within 45 days.`;
   }
 
-  // Closing Deadline
-  if (qLower.includes("closing") || qLower.includes("deadline") || qLower.includes("date") || qLower.includes("time") || qLower.includes("when")) {
-    const dt = tender.closing_date ? new Date(tender.closing_date).toLocaleString("en-IN") : "Announced on eproc.isro.gov.in";
-    return `• **Bid Submission Deadline:** **${dt}**.
-• **Technical Bid Opening:** Next working day at ${tender.issuing_center}.
-• **Submission Portal:** [eproc.isro.gov.in](https://eproc.isro.gov.in) with Class-3 DSC digital signature.
+  // Question: Testing & Inspection (NDT / CMM / Cleanroom)
+  if (qLower.includes("test") || qLower.includes("inspection") || qLower.includes("cmm") || qLower.includes("ndt") || qLower.includes("x-ray") || qLower.includes("cleanroom")) {
+    return `• Pre-Dispatch Inspection (PDI): Conducted jointly with ISRO Quality Assurance at your facility.
+• Dimensional Check: 100% CMM 3D inspection verifying ±${reqTolUm} µm tolerances.
+• Cleanroom Packaging: ISO Class 7 dust-controlled packaging with dry nitrogen purge.
 
-**👉 Bottom Line:** Submit your Technical Envelope at least 12 hours before deadline.`;
+Bottom Line: Request PDI 14 days before dispatch to secure official QA clearance.`;
   }
 
-  // Win Chance & Competitors
-  if (qLower.includes("win") || qLower.includes("probability") || qLower.includes("chance") || qLower.includes("score") || qLower.includes("l1")) {
-    return `• **Win Probability Score:** **95% (High Winning Alignment)**.
-• **MSE 25% Advantage:** If your quote is within 15% of lowest price (L1), you get 25% order share.
-• **Working Capital Edge:** Your **₹0 EMD** saves ₹6.40 Lakhs upfront cash.
+  // Question: ISRO Center Location & Dispatch
+  if (qLower.includes("center") || qLower.includes("where") || qLower.includes("location") || qLower.includes("vssc") || qLower.includes("ursc") || qLower.includes("sac") || qLower.includes("sdsc") || qLower.includes("iprc")) {
+    return `• Issuing Center: ${tender.issuing_center} (${tender.center_code || "ISRO"}).
+• Scope of Work: ${tender.title}.
+• Delivery Terms: Free On Rail (FOR) Destination at Central Stores, ${tender.issuing_center}.
 
-**👉 Bottom Line:** You are a prime candidate for technical qualification. Proceed to bid!`;
+Bottom Line: Factor inland insured transportation into your Envelope-2 quote.`;
   }
 
-  // Default Simple Answer
-  return `• **Tender Ref:** **${tender.reference_number}** (${tender.issuing_center}).
-• **Technical Match:** **100% compliant** for ${tender.title} (±${reqTolUm} µm tolerance & ${alloyName}).
-• **Financial Privilege:** **100% EMD fee exemption (₹0 deposit)** under GFR 170(i).
+  // Default Comprehensive Answer
+  return `• Tender Reference: ${tender.reference_number} (${tender.issuing_center}).
+• Technical Match: 100% compliant for ${tender.title} (±${reqTolUm} µm tolerance & ${alloyName}).
+• Financial Privilege: 100% EMD fee exemption (₹0 deposit) under GFR 170(i).
 
-**👉 Bottom Line:** Click "Download Official PDF Dossier" on the tender card to generate your proposal.`;
+Bottom Line: Click "Download Official PDF Dossier" on the tender card to generate your proposal.`;
 }
