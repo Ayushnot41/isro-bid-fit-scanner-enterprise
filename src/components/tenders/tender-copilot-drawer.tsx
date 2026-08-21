@@ -148,7 +148,7 @@ Click any question chip above or ask anything about eligibility, tolerances, GFR
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.94, y: 15 }}
           transition={{ type: "spring", stiffness: 350, damping: 25 }}
-          className="relative z-10 w-full sm:w-[420px] h-[520px] max-h-[85vh] bg-[#0c0e12]/95 backdrop-blur-xl border border-cyan-500/40 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden font-sans hardware-accelerated"
+          className="relative z-10 w-full sm:w-[420px] h-[520px] max-h-[85vh] bg-[#0c0e12]/95 backdrop-blur-xl border border-cyan-500/40 rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden font-sans"
         >
           {/* Compact Header */}
           <div className="px-4 py-2.5 bg-[#13161a] border-b border-[#222730] flex items-center justify-between flex-shrink-0">

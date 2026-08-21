@@ -1,28 +1,38 @@
 import { useEffect } from "react";
 
+let activeLocksCount = 0;
+let originalOverflow = "";
+let originalPaddingRight = "";
+
 /**
- * Locks document.body scroll when a modal/drawer/overlay is mounted.
- * Restores original overflow on unmount or when `locked` becomes false.
+ * Robust Reference-Counted Body Scroll Lock Hook
+ * Prevents background scroll when modals/drawers are open, while ensuring
+ * document.body overflow is always cleanly restored when closed.
  */
 export function useLockBodyScroll(locked: boolean) {
   useEffect(() => {
     if (!locked) return;
 
-    const originalOverflow = document.body.style.overflow;
-    const originalPaddingRight = document.body.style.paddingRight;
+    if (activeLocksCount === 0) {
+      originalOverflow = document.body.style.overflow || "";
+      originalPaddingRight = document.body.style.paddingRight || "";
 
-    // Measure scrollbar width to prevent layout shift
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth;
+      const scrollbarWidth =
+        window.innerWidth - document.documentElement.clientWidth;
 
-    document.body.style.overflow = "hidden";
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      document.body.style.overflow = "hidden";
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
     }
+    activeLocksCount++;
 
     return () => {
-      document.body.style.overflow = originalOverflow;
-      document.body.style.paddingRight = originalPaddingRight;
+      activeLocksCount = Math.max(0, activeLocksCount - 1);
+      if (activeLocksCount === 0) {
+        document.body.style.overflow = originalOverflow || "";
+        document.body.style.paddingRight = originalPaddingRight || "";
+      }
     };
   }, [locked]);
 }

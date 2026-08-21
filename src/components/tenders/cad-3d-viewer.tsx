@@ -32,7 +32,7 @@ export function Cad3dViewer({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hardware-accelerated">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -51,7 +51,7 @@ export function Cad3dViewer({
           className="relative z-10 w-full max-w-4xl bg-[#0d0f12] border border-cyan-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         >
           {/* Header */}
-          <div className="p-4 bg-[#13161a] border-b border-[#222730] flex items-center justify-between">
+          <div className="flex-shrink-0 p-4 bg-[#13161a] border-b border-[#222730] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
                 <Box className="w-4 h-4" />
@@ -280,7 +280,7 @@ export function Cad3dViewer({
           </div>
 
           {/* Footer Metadata */}
-          <div className="p-3 bg-[#13161a] border-t border-[#222730] flex items-center justify-between text-xs font-mono">
+          <div className="flex-shrink-0 p-3 bg-[#13161a] border-t border-[#222730] flex items-center justify-between text-xs font-mono">
             <span className="text-zinc-400 text-[11px]">
               STEP / IGES 3D Geometry Extractor • GPU Hardware Acceleration
             </span>

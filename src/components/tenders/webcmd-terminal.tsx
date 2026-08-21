@@ -182,7 +182,7 @@ export function WebCmdTerminal({ isOpen, onClose, onScrapeSuccess }: WebCmdTermi
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-full max-w-2xl hardware-accelerated">
+    <div className="fixed bottom-4 right-4 z-50 w-full max-w-2xl">
       <div className="bg-zinc-950/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[480px]">
         {/* Terminal Header */}
         <div className="flex-shrink-0 px-4 py-3 bg-zinc-900/90 border-b border-zinc-800 flex items-center justify-between">

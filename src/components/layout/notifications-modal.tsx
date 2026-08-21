@@ -203,7 +203,7 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-end sm:p-6 p-2 bg-black/65 backdrop-blur-md hardware-accelerated">
+        <div className="fixed inset-0 z-50 flex items-start justify-end sm:p-6 p-2 bg-black/65 backdrop-blur-md overflow-hidden">
           {/* Backdrop Click to Close */}
           <motion.div
             initial={{ opacity: 0 }}

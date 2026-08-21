@@ -70,16 +70,12 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
-  /* GPU Hardware Acceleration */
+  /* GPU Hardware Acceleration - Scroll-safe */
   .hardware-accelerated {
-    transform: translateZ(0);
     will-change: transform, opacity;
-    backface-visibility: hidden;
-    perspective: 1000px;
   }
 
   .gpu-layer {
-    contain: paint layout style;
     transform: translate3d(0, 0, 0);
   }
 

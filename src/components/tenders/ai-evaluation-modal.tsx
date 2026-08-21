@@ -59,7 +59,7 @@ export function AiEvaluationModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden selection:bg-emerald-500/30 hardware-accelerated">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden selection:bg-emerald-500/30">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -75,7 +75,7 @@ export function AiEvaluationModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-4xl max-h-[85vh] bg-[#0e1115] border border-[#222730] rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden z-10 my-auto"
+            className="relative w-full max-w-4xl h-[88vh] max-h-[88vh] bg-[#0e1115] border border-[#222730] rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden z-10 my-auto"
           >
             {/* Modal Header */}
             <div className="flex-shrink-0 p-5 sm:p-6 border-b border-[#222730] flex items-start justify-between bg-[#13161a]">
@@ -108,7 +108,7 @@ export function AiEvaluationModal({
             </div>
 
             {/* Modal Scrollable Body */}
-            <div className="flex-1 min-h-0 p-6 overflow-y-auto overscroll-contain custom-scrollbar space-y-5 bg-[#0a0b0e] pb-8">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar p-6 space-y-5 bg-[#0a0b0e] pb-10">
               {/* Score Breakdown Banner */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center p-5 bg-[#13161a] border border-[#222730] rounded-xl shadow-inner">
                 <div className="md:col-span-4 flex flex-col items-center justify-center">

@@ -14,7 +14,7 @@ export default function DashboardPage() {
   const latestEval = evals[0] || null;
 
   return (
-    <div className="space-y-7 max-w-7xl mx-auto selection:bg-emerald-500/30 hardware-accelerated">
+    <div className="space-y-7 max-w-7xl mx-auto selection:bg-emerald-500/30 pb-20">
       {/* Top Telemetry Command Center Banner */}
       <div className="relative p-6 sm:p-7 rounded-2xl bg-[#0e1115] border border-[#222730] overflow-hidden shadow-xl shadow-black/40">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">

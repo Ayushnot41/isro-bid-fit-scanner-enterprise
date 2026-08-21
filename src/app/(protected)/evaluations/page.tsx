@@ -8,7 +8,7 @@ export default function EvaluationsPage() {
   const evaluations: BidEvaluation[] = INITIAL_EVALUATIONS;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto hardware-accelerated">
+    <div className="space-y-6 max-w-7xl mx-auto pb-20">
       <div>
         <div className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

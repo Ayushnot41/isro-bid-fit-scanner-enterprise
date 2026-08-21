@@ -93,7 +93,7 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
   };
 
   return (
-    <div className="space-y-6 hardware-accelerated">
+    <div className="space-y-6">
       {/* Search & Action Bar */}
       <div className="bg-[#13161a] border border-[#222730] p-4 rounded-2xl space-y-4 shadow-md">
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
