@@ -222,24 +222,25 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-start justify-end p-3 sm:p-6 pt-16 sm:pt-6 overflow-hidden pointer-events-auto">
-          {/* Backdrop with Aerospace Blur */}
+          {/* Pure Dark Backdrop Overlay - Zero GPU Blur Latency */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 bg-black/80 cursor-pointer"
           />
 
-          {/* Modal Container */}
+          {/* Modal Container - Ultra-Fast 120 FPS Entrance */}
           <motion.div
-            initial={{ opacity: 0, y: -15, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -15, scale: 0.96 }}
-            transition={{ type: "spring", damping: 28, stiffness: 350 }}
+            initial={{ opacity: 0, scale: 0.97, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: -10 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className={`relative z-10 w-full sm:w-[500px] ${
               activeTab === "SUITE" || selectedInsight ? "sm:w-[650px]" : ""
-            } h-[86vh] max-h-[86vh] bg-[#0e1115] border border-emerald-500/40 rounded-2xl shadow-2xl shadow-black overflow-hidden flex flex-col transition-all duration-300`}
+            } h-[86vh] max-h-[86vh] bg-[#0e1115] border border-emerald-500/40 rounded-2xl shadow-2xl shadow-black overflow-hidden flex flex-col`}
           >
             {/* Modal Header */}
             <div className="flex-shrink-0 p-4 bg-[#0d0f12] border-b border-[#222730] flex items-center justify-between">

@@ -202,44 +202,29 @@ export function TenderkartLanding() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Text & CTAs */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#13161a] border border-emerald-500/30 text-emerald-400 text-xs font-mono"
-            >
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="lg:col-span-7 space-y-6 text-center lg:text-left"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#13161a] border border-emerald-500/30 text-emerald-400 text-xs font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               ISRO Space Procurement & Defense Bid Intelligence
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.05 }}
-              className="text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight font-sans"
-            >
+            <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight font-sans">
               Autonomous ISRO Tender Intelligence & Bid-Fit Scanner
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.1 }}
-              className="text-sm sm:text-base text-zinc-300 max-w-xl leading-relaxed"
-            >
+            <p className="text-sm sm:text-base text-zinc-300 max-w-xl leading-relaxed">
               Scan space-grade RFPs, verify GD&T micro-tolerances (±5 µm), apply statutory MSME EMD exemptions under GFR 170(i), and generate technical proposals in seconds.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.15 }}
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2"
-            >
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
               <button
                 onClick={() => handleProtectedAction("launch command center", () => router.push("/dashboard"))}
-                className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-950/40 active:scale-95"
+                className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-950/40 active:scale-95 cursor-pointer"
               >
                 <span>Launch Command Center</span>
                 <ArrowRight className="w-4 h-4" />
@@ -258,15 +243,10 @@ export function TenderkartLanding() {
                 <Building2 className="w-4 h-4" />
                 <span>Onboard Workshop (MSME)</span>
               </Link>
-            </motion.div>
+            </div>
 
             {/* Metrics Strip */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4 font-mono text-xs text-left"
-            >
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4 font-mono text-xs text-left">
               <div className="p-3 rounded-xl bg-[#0e1115] border border-[#222730]">
                 <span className="text-zinc-500 text-[10px] block">MONITORED</span>
                 <span className="text-white font-bold text-xs sm:text-sm">6 ISRO Centers</span>
@@ -283,32 +263,32 @@ export function TenderkartLanding() {
                 <span className="text-zinc-500 text-[10px] block">MSME BENEFIT</span>
                 <span className="text-amber-400 font-bold text-xs sm:text-sm">₹0 EMD Deposit</span>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
 
           {/* Right Column: 3D Aerospace Hardware Showcase Component */}
           <div className="lg:col-span-5 relative">
             <style jsx>{`
               @keyframes heroOrbit {
                 0% {
-                  transform: rotateX(22deg) rotateY(0deg);
+                  transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(0deg);
                 }
                 100% {
-                  transform: rotateX(22deg) rotateY(360deg);
+                  transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(360deg);
                 }
               }
               .hero-3d-active {
-                animation: heroOrbit 14s linear infinite;
+                animation: heroOrbit 16s linear infinite;
                 transform-style: preserve-3d;
                 will-change: transform;
               }
               .hero-3d-static {
-                transform: rotateX(22deg) rotateY(45deg);
+                transform: translate3d(0, 0, 0) rotateX(22deg) rotateY(45deg);
                 transform-style: preserve-3d;
               }
             `}</style>
 
-            <div className="relative p-6 rounded-3xl bg-[#0e1115]/90 border border-cyan-500/30 backdrop-blur-xl shadow-2xl shadow-cyan-950/20 overflow-hidden">
+            <div className="relative p-6 rounded-3xl bg-[#0e1115] border border-cyan-500/30 shadow-2xl shadow-cyan-950/20 overflow-hidden">
               {/* Header HUD */}
               <div className="flex items-center justify-between pb-3 border-b border-[#222730] text-xs font-mono">
                 <div className="flex items-center gap-2">
