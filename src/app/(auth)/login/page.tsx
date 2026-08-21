@@ -14,9 +14,8 @@ import {
   Sparkles,
   ShieldCheck,
   Building2,
-  UserCheck,
+  Radio,
 } from "lucide-react";
-import Link from "next/link";
 
 function AuthForm() {
   const [tab, setTab] = useState<"login" | "register" | "admin">("login");
@@ -80,7 +79,7 @@ function AuthForm() {
     setError(null);
 
     try {
-      const { data, error: authError } = await supabase.auth.signUp({
+      const { data } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -134,24 +133,29 @@ function AuthForm() {
   };
 
   return (
-    <div className="relative z-10 w-full max-w-md px-4 sm:px-6">
+    <div className="relative z-10 w-full max-w-md px-4 sm:px-6 selection:bg-emerald-500/30">
       {/* Brand Icon & Heading */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 mb-3 shadow-lg shadow-emerald-950/40">
-          <Rocket className="w-7 h-7 text-emerald-400" />
-        </div>
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 mb-3 shadow-lg shadow-emerald-950/40 text-emerald-400"
+        >
+          <Rocket className="w-7 h-7" />
+        </motion.div>
         <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
           ISRO Bid-Fit Scanner
         </h1>
-        <p className="text-zinc-400 text-xs mt-0.5">
-          Enterprise Multi-Tenant Procurement Intelligence
+        <p className="text-zinc-400 text-xs mt-0.5 font-mono">
+          Enterprise Autonomous Procurement Intelligence
         </p>
       </div>
 
       {/* Main Container */}
-      <div className="bg-zinc-900/95 border border-zinc-800 rounded-3xl p-6 sm:p-7 shadow-2xl shadow-black/80 space-y-5">
+      <div className="bg-[#0e1115] border border-[#222730] rounded-2xl p-6 sm:p-7 shadow-2xl shadow-black/80 space-y-5">
         {/* Auth Role / Tab Switcher */}
-        <div className="grid grid-cols-3 p-1 bg-zinc-950 rounded-xl border border-zinc-800 text-xs font-semibold">
+        <div className="grid grid-cols-3 p-1 bg-[#0a0b0e] rounded-xl border border-[#222730] text-xs font-semibold">
           <button
             type="button"
             onClick={() => { setTab("login"); setError(null); }}
@@ -188,20 +192,20 @@ function AuthForm() {
         </div>
 
         {/* Quick Demo Credentials Bar */}
-        <div className="flex items-center justify-between p-2.5 bg-zinc-950/70 border border-zinc-800/80 rounded-xl text-[11px]">
-          <span className="text-zinc-400 font-mono">Quick Fill:</span>
+        <div className="flex items-center justify-between p-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-[11px]">
+          <span className="text-zinc-400 font-mono">Demo Accounts:</span>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => fillQuickAccount("vendor")}
-              className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-emerald-300 font-medium transition-colors"
+              className="px-2 py-0.5 rounded bg-[#181c22] hover:bg-[#222730] text-emerald-300 font-medium font-mono transition-colors"
             >
               Vendor Demo
             </button>
             <button
               type="button"
               onClick={() => fillQuickAccount("admin")}
-              className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-purple-300 font-medium transition-colors"
+              className="px-2 py-0.5 rounded bg-[#181c22] hover:bg-[#222730] text-purple-300 font-medium font-mono transition-colors"
             >
               ISRO Admin
             </button>
@@ -223,7 +227,7 @@ function AuthForm() {
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="e.g. AeroSpace Dynamics India Pvt. Ltd."
                   required
-                  className="w-full pl-9 pr-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50"
+                  className="w-full pl-9 pr-3 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50"
                 />
               </div>
             </div>
@@ -240,7 +244,7 @@ function AuthForm() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="vendor@company.in"
                   required
-                  className="w-full pl-9 pr-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50"
+                  className="w-full pl-9 pr-3 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50"
                 />
               </div>
             </div>
@@ -258,7 +262,7 @@ function AuthForm() {
                   placeholder="Min. 6 characters"
                   required
                   minLength={6}
-                  className="w-full pl-9 pr-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50"
+                  className="w-full pl-9 pr-3 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50"
                 />
               </div>
             </div>
@@ -266,7 +270,7 @@ function AuthForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white font-semibold text-xs rounded-xl transition-all shadow-md"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-cyan-600 hover:bg-cyan-500 active:scale-[0.98] disabled:opacity-50 text-white font-semibold text-xs rounded-xl transition-all shadow-md"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Enterprise Account"}
             </button>
@@ -285,7 +289,7 @@ function AuthForm() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={tab === "admin" ? "officer@isro.gov.in" : "contracts@aeroprecision.in"}
                   required
-                  className="w-full pl-9 pr-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
+                  className="w-full pl-9 pr-3 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
                 />
               </div>
             </div>
@@ -302,7 +306,7 @@ function AuthForm() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-9 pr-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
+                  className="w-full pl-9 pr-3 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
                 />
               </div>
             </div>
@@ -317,7 +321,7 @@ function AuthForm() {
                   value={adminKey}
                   onChange={(e) => setAdminKey(e.target.value)}
                   placeholder="isro-admin"
-                  className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/50"
+                  className="w-full px-3.5 py-2 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/50"
                 />
               </div>
             )}
@@ -327,13 +331,13 @@ function AuthForm() {
               disabled={loading}
               className={`w-full flex items-center justify-center gap-2 py-2.5 ${
                 tab === "admin" ? "bg-purple-600 hover:bg-purple-500" : "bg-emerald-600 hover:bg-emerald-500"
-              } disabled:opacity-50 text-white font-semibold text-xs rounded-xl transition-all shadow-md`}
+              } active:scale-[0.98] disabled:opacity-50 text-white font-semibold text-xs rounded-xl transition-all shadow-md`}
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  {tab === "admin" ? "Authenticate as ISRO Admin" : "Sign In to Vault"}
+                  <span>{tab === "admin" ? "Authenticate as ISRO Admin" : "Sign In to Vault"}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
@@ -342,14 +346,14 @@ function AuthForm() {
         )}
 
         {/* Instant 1-Click Launch Showcase */}
-        <div className="pt-2 border-t border-zinc-800/80">
+        <div className="pt-2 border-t border-[#222730]">
           <button
             type="button"
             onClick={handleLaunchDemo}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-zinc-700/80 text-xs font-semibold rounded-xl transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#181c22] hover:bg-[#222730] active:scale-[0.98] text-zinc-200 hover:text-white border border-[#222730] text-xs font-semibold rounded-xl transition-all"
           >
             <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            1-Click Instant Demo Showcase
+            <span>1-Click Demo Showcase (AeroPrecision India)</span>
           </button>
         </div>
       </div>
@@ -359,7 +363,9 @@ function AuthForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-[#08090a] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Ambient Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
       <Suspense fallback={<div className="text-zinc-500 text-xs font-mono">Initializing Authentication Vault...</div>}>
         <AuthForm />
       </Suspense>

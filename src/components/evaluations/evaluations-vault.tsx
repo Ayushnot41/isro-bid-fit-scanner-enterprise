@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import type { BidEvaluation, ScrapedTender } from "@/lib/types/database";
 import { ScoreGauge } from "@/components/ui/score-gauge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
-import { Search, SlidersHorizontal, ChevronRight, Sparkles, ShieldCheck, FileText, Download } from "lucide-react";
+import { Search, ChevronRight, FileText, Download } from "lucide-react";
 import { AiEvaluationModal } from "@/components/tenders/ai-evaluation-modal";
 import { INITIAL_SCRAPED_TENDERS } from "@/lib/mock-data";
 
@@ -75,7 +75,7 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
   return (
     <div className="space-y-6">
       {/* Search & Action Bar */}
-      <div className="bg-zinc-900/90 border border-zinc-800 p-4 rounded-2xl space-y-4">
+      <div className="bg-[#13161a] border border-[#222730] p-4 rounded-2xl space-y-4 shadow-md">
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
@@ -84,7 +84,7 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search evaluated dossiers by tender title, center, or RFP code..."
-              className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/80 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/40 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50 transition-all font-sans"
             />
           </div>
 
@@ -94,14 +94,14 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
             onClick={handleExportCSV}
             className="w-full sm:w-auto text-xs flex items-center gap-1.5"
           >
-            <Download className="w-3.5 h-3.5" />
-            Export Vault (CSV)
+            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Export Vault (CSV)</span>
           </Button>
         </div>
 
         {/* Score Filter Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-xs text-zinc-500 font-mono mr-1">Filter Match:</span>
+          <span className="text-xs text-zinc-500 font-mono mr-1">Match Filter:</span>
           {(
             [
               { id: "ALL", label: "All Dossiers" },
@@ -118,7 +118,7 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
                 className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all ${
                   active
                     ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm"
-                    : "bg-zinc-950 text-zinc-400 border border-zinc-800 hover:border-zinc-700 hover:text-white"
+                    : "bg-[#0a0b0e] text-zinc-400 border border-[#222730] hover:border-[#303744] hover:text-white"
                 }`}
               >
                 {filter.label}
@@ -130,7 +130,7 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
 
       {/* Dossiers Grid */}
       {filteredEvals.length === 0 ? (
-        <div className="text-center py-16 bg-zinc-900/40 border border-zinc-800 rounded-2xl text-zinc-500">
+        <div className="text-center py-16 bg-[#13161a] border border-[#222730] rounded-2xl text-zinc-500">
           <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm font-medium">No evaluation dossiers match your criteria.</p>
         </div>
@@ -139,15 +139,15 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
           {filteredEvals.map((evaluation, index) => (
             <motion.div
               key={evaluation.id}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.03 }}
+              transition={{ duration: 0.3, delay: index * 0.03, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => handleOpenDossier(evaluation)}
-              className="bg-zinc-900/85 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-2xl p-5 transition-all cursor-pointer group shadow-lg hover:shadow-emerald-950/20 flex flex-col justify-between"
+              className="bg-[#13161a] hover:bg-[#161a20] border border-[#222730] hover:border-[#303744] rounded-2xl p-5 transition-all cursor-pointer group shadow-md flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-3 mb-2">
-                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
                     {evaluation.tender_reference}
                   </span>
                   <Badge
@@ -184,12 +184,12 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-zinc-800/80 text-xs">
-                <span className="text-zinc-500 font-mono">
+              <div className="flex items-center justify-between pt-3 border-t border-[#222730] text-xs">
+                <span className="text-zinc-500 font-mono text-[11px]">
                   {formatDate(evaluation.evaluated_at)}
                 </span>
-                <span className="text-emerald-400 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Inspect Full Dossier
+                <span className="text-emerald-400 font-semibold text-xs flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  <span>Inspect Full Dossier</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </span>
               </div>
