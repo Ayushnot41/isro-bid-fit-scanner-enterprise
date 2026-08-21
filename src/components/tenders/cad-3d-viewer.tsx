@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Box, RotateCw, ZoomIn, ZoomOut, Layers, Eye, X, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface Cad3dViewerProps {
   partName: string;
@@ -24,6 +25,8 @@ export function Cad3dViewer({
   const [wireframe, setWireframe] = useState(false);
   const [highlightTolerances, setHighlightTolerances] = useState(true);
   const [isRotating, setIsRotating] = useState(true);
+
+  useLockBodyScroll(isOpen);
 
   if (!isOpen) return null;
 

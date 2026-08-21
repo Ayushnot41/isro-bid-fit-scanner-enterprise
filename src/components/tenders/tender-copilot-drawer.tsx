@@ -5,6 +5,7 @@ import { MessageSquare, Send, Sparkles, X, Bot, User, Layers, Target, DollarSign
 import type { ScrapedTender } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface TenderCoPilotDrawerProps {
   tender: ScrapedTender | null;
@@ -53,6 +54,9 @@ export function TenderCoPilotDrawer({ tender, isOpen, onClose }: TenderCoPilotDr
   const [activeCategory, setActiveCategory] = useState<"ALL" | "ELIGIBILITY" | "PRIORITY" | "FINANCIAL" | "ACTION" | "STRATEGY">("ALL");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Lock background scroll when drawer is open
+  useLockBodyScroll(isOpen);
 
   useEffect(() => {
     if (tender) {
@@ -240,7 +244,7 @@ Click any question chip above or ask anything about eligibility, tolerances, GFR
           </div>
 
           {/* Messages Feed (Scrollable Center) */}
-          <div className="flex-1 p-3.5 overflow-y-auto space-y-2.5 font-sans text-xs custom-scrollbar">
+          <div className="flex-1 min-h-0 p-3.5 overflow-y-auto overscroll-contain space-y-2.5 font-sans text-xs custom-scrollbar">
             {messages.map((msg) => (
               <div
                 key={msg.id}

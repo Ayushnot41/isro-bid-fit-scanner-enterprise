@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import {
   Rocket,
   ShieldCheck,
@@ -48,6 +49,9 @@ export function TenderkartLanding() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showAuthGateModal, setShowAuthGateModal] = useState(false);
   const [authGateAction, setAuthGateAction] = useState("access this procurement tool");
+
+  // Lock background scroll when auth gate modal is open
+  useLockBodyScroll(showAuthGateModal);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // 3D Hero Component Controls

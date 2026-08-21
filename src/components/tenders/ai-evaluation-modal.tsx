@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import type { BidEvaluation, ScrapedTender } from "@/lib/types/database";
 import { ScoreGauge } from "@/components/ui/score-gauge";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +47,9 @@ export function AiEvaluationModal({
   const [showConsortium, setShowConsortium] = useState(false);
   const [showDsc, setShowDsc] = useState(false);
 
+  // Lock background scroll when modal is open
+  useLockBodyScroll(isOpen);
+
   if (!tender || !evaluation) return null;
 
   const handleDownloadDossier = () => {
@@ -74,7 +78,7 @@ export function AiEvaluationModal({
             className="relative w-full max-w-4xl max-h-[85vh] bg-[#0e1115] border border-[#222730] rounded-2xl shadow-2xl shadow-black/90 flex flex-col overflow-hidden z-10 my-auto"
           >
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 border-b border-[#222730] flex items-start justify-between bg-[#13161a]">
+            <div className="flex-shrink-0 p-5 sm:p-6 border-b border-[#222730] flex items-start justify-between bg-[#13161a]">
               <div className="flex-1 pr-6">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-md border border-emerald-500/25">
@@ -104,7 +108,7 @@ export function AiEvaluationModal({
             </div>
 
             {/* Modal Scrollable Body */}
-            <div className="p-6 overflow-y-auto space-y-5 flex-1 bg-[#0a0b0e]">
+            <div className="flex-1 min-h-0 p-6 overflow-y-auto overscroll-contain custom-scrollbar space-y-5 bg-[#0a0b0e] pb-8">
               {/* Score Breakdown Banner */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center p-5 bg-[#13161a] border border-[#222730] rounded-xl shadow-inner">
                 <div className="md:col-span-4 flex flex-col items-center justify-center">
@@ -343,7 +347,7 @@ export function AiEvaluationModal({
             </div>
 
             {/* Modal Footer with Direct PDF Download & Print */}
-            <div className="p-4 border-t border-[#222730] bg-[#13161a] flex flex-wrap items-center justify-between gap-3">
+            <div className="flex-shrink-0 p-4 border-t border-[#222730] bg-[#13161a] flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleDownloadDossier}

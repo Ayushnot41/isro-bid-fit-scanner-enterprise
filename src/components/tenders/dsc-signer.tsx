@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { KeyRound, ShieldCheck, CheckCircle2, Lock, FileCheck2, Sparkles, X, Usb } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface DscSignerProps {
   tenderReference: string;
@@ -21,6 +22,8 @@ export function DscSigner({
   const [signatureComplete, setSignatureComplete] = useState(false);
   const [sha256Hash, setSha256Hash] = useState<string | null>(null);
 
+  useLockBodyScroll(isOpen);
+
   const handleSign = () => {
     setIsSigning(true);
     setTimeout(() => {
@@ -34,7 +37,7 @@ export function DscSigner({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hardware-accelerated">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hardware-accelerated overflow-hidden">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -48,10 +51,10 @@ export function DscSigner({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="relative z-10 w-full max-w-lg bg-[#0e1115] border border-amber-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          className="relative z-10 w-full max-w-lg bg-[#0e1115] border border-amber-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]"
         >
           {/* Header */}
-          <div className="p-4 bg-[#13161a] border-b border-[#222730] flex items-center justify-between">
+          <div className="flex-shrink-0 p-4 bg-[#13161a] border-b border-[#222730] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 <KeyRound className="w-4 h-4" />
@@ -78,7 +81,7 @@ export function DscSigner({
           </div>
 
           {/* Body */}
-          <div className="p-5 space-y-4 text-xs font-sans">
+          <div className="flex-1 min-h-0 p-5 overflow-y-auto overscroll-contain custom-scrollbar space-y-4 text-xs font-sans">
             {signatureComplete ? (
               <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-center space-y-2">
                 <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto">
@@ -123,7 +126,7 @@ export function DscSigner({
           </div>
 
           {/* Footer */}
-          <div className="p-3.5 bg-[#13161a] border-t border-[#222730] flex items-center justify-between">
+          <div className="flex-shrink-0 p-3.5 bg-[#13161a] border-t border-[#222730] flex items-center justify-between">
             <span className="text-[11px] font-mono text-zinc-400">
               {signatureComplete ? "Ready for eproc.isro.gov.in" : "Indian IT Act 2000 Section 3A"}
             </span>
