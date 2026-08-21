@@ -221,14 +221,14 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
   const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-end p-3 sm:p-6 pt-16 sm:pt-6 bg-black/70 backdrop-blur-sm overflow-hidden pointer-events-auto">
-          {/* Backdrop Click to Close */}
+        <div className="fixed inset-0 z-[100] flex items-start justify-end p-3 sm:p-6 pt-16 sm:pt-6 overflow-hidden pointer-events-auto">
+          {/* Backdrop with Aerospace Blur */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 cursor-pointer"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
           />
 
           {/* Modal Container */}

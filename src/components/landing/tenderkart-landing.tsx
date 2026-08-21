@@ -111,7 +111,7 @@ export function TenderkartLanding() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090a] text-zinc-100 selection:bg-emerald-500/30 font-sans hardware-accelerated overflow-x-hidden">
+    <div className="min-h-screen bg-[#08090a] text-zinc-100 selection:bg-emerald-500/30 font-sans">
       {/* Top Navbar */}
       <motion.header
         initial={{ y: -20, opacity: 0 }}
