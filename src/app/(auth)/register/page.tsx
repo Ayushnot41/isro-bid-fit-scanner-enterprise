@@ -1,42 +1,98 @@
-import { SignUp } from "@clerk/nextjs";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Sparkles, Shield, Building2, Mail, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function RegisterPage() {
+  const [companyName, setCompanyName] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    document.cookie = "demo_session=true; path=/; max-age=86400";
+    setTimeout(() => {
+      router.push("/profile");
+    }, 400);
+  };
+
   return (
-    <div className="min-h-screen bg-[#08090a] flex items-center justify-center relative overflow-hidden">
-      {/* Background grid */}
+    <div className="min-h-screen bg-[#08090a] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Grid */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
             "linear-gradient(#10b981 1px, transparent 1px), linear-gradient(90deg, #10b981 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
+          backgroundSize: "36px 36px",
         }}
       />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative z-10 flex flex-col items-center gap-6">
-        <div className="text-center mb-2">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-              <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <span className="text-white font-bold text-lg tracking-tight">ISRO Bid-Fit</span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 rounded-md">PRO</span>
+      <div className="relative z-10 w-full max-w-md bg-[#0e1115] border border-[#222730] rounded-2xl shadow-2xl p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+            <Shield className="w-3.5 h-3.5" />
+            Empaneled Supplier Portal
           </div>
-          <p className="text-zinc-500 text-xs font-mono">Create your vendor account</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Register Aerospace Enterprise
+          </h1>
+          <p className="text-xs text-zinc-400 font-mono">
+            Onboard your CNC workshop & AS9100D certifications
+          </p>
         </div>
 
-        <SignUp
-          routing="hash"
-          appearance={{
-            elements: {
-              rootBox: "w-full",
-              card: "bg-[#0e1115] border border-[#222730] shadow-2xl shadow-black/60 rounded-2xl",
-            },
-          }}
-        />
+        <form onSubmit={handleRegister} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono text-zinc-300">Company Name</label>
+            <div className="relative">
+              <Building2 className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="e.g. AeroPrecision Dynamics Pvt. Ltd."
+                required
+                className="w-full pl-10 pr-4 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono text-zinc-300">Official Work Email</label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="procurement@company.in"
+                required
+                className="w-full pl-10 pr-4 py-2.5 bg-[#0a0b0e] border border-[#222730] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
+              />
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl shadow-lg transition-all"
+          >
+            {loading ? "Registering..." : "Create Supplier Account"}
+          </Button>
+        </form>
+
+        <div className="pt-2 border-t border-[#222730] text-center text-xs text-zinc-500 font-mono">
+          <span>Already registered? </span>
+          <Link href="/login" className="text-emerald-400 hover:underline">
+            Sign In
+          </Link>
+        </div>
       </div>
     </div>
   );

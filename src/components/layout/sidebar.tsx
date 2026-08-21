@@ -15,7 +15,7 @@ import {
   ExternalLink,
   ShieldCheck,
 } from "lucide-react";
-import { useClerk, UserButton } from "@clerk/nextjs";
+import { useAuth } from "@/components/auth/auth-provider";
 
 const navItems = [
   { href: "/dashboard", label: "Command Center", icon: LayoutDashboard },
@@ -26,7 +26,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { signOut } = useClerk();
+  const { signOut } = useAuth();
 
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-[#0d0f12] border-r border-[#222730] flex flex-col z-40 selection:bg-emerald-500/30">
@@ -125,18 +125,11 @@ export function Sidebar() {
           <ExternalLink className="w-3 h-3" />
         </a>
 
-        <div className="flex items-center gap-2.5 px-3 py-2">
-          <UserButton
-            afterSignOutUrl="/login"
-            appearance={{
-              elements: {
-                avatarBox: "w-7 h-7",
-              },
-            }}
-          />
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-[11px] font-mono text-zinc-500">AeroPrecision India</span>
           <button
-            onClick={() => signOut({ redirectUrl: "/login" })}
-            className="flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-red-400 transition-colors"
+            onClick={() => signOut()}
+            className="flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-red-400 transition-colors"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>

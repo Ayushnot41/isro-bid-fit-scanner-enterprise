@@ -1,10 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import type { VendorProfile } from "@/lib/types/database";
 import { DEMO_VENDOR_PROFILE } from "@/lib/mock-data";
 import { cookies } from "next/headers";
-import { auth } from "@clerk/nextjs/server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,18 +10,9 @@ export async function GET() {
   try {
     const cookieStore = cookies();
     const isDemo = cookieStore.get("demo_session")?.value === "true";
+    const effectiveUserId = "demo-vendor-id";
 
-    let clerkUserId: string | null = null;
-    try {
-      const authObj = auth();
-      clerkUserId = authObj.userId;
-    } catch {
-      clerkUserId = null;
-    }
-
-    const effectiveUserId = clerkUserId || "demo-vendor-id";
-
-    // Try fetching from Supabase using Admin client to bypass RLS with Clerk UID
+    // Try fetching from Supabase using Admin client
     try {
       const admin = createAdminClient();
       const { data: dbProfile, error } = await admin
@@ -46,7 +35,7 @@ export async function GET() {
         ...DEMO_VENDOR_PROFILE,
         user_id: effectiveUserId,
       },
-      is_demo: isDemo || !clerkUserId,
+      is_demo: isDemo,
     });
   } catch (error) {
     console.error("GET /api/profile error:", error);
@@ -59,21 +48,8 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const cookieStore = cookies();
-    const isDemo = cookieStore.get("demo_session")?.value === "true";
-
-    let clerkUserId: string | null = null;
-    try {
-      const authObj = auth();
-      clerkUserId = authObj.userId;
-    } catch {
-      clerkUserId = null;
-    }
-
-    const effectiveUserId = clerkUserId || "demo-vendor-id";
-
+    const effectiveUserId = "demo-vendor-id";
     const payload = await request.json();
-
 
     const sanitizedProfile: Partial<VendorProfile> = {
       company_name: payload.company_name || "AeroPrecision India Ltd.",
@@ -145,4 +121,3 @@ export async function PUT(request: Request) {
     );
   }
 }
-
