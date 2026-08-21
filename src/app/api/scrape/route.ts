@@ -4,6 +4,7 @@ import {
   scrapeISROTenders,
   transformToTenderInsert,
 } from "@/lib/scraper/isro-tenders";
+import { executeWebCmdScrape } from "@/lib/scraper/webcmd-engine";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
@@ -27,6 +28,9 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Execute WebCMD autonomous scraping telemetry
+    const webcmdResult = await executeWebCmdScrape();
+
     const rawTenders = await scrapeISROTenders();
     const tenderInserts = rawTenders.map(transformToTenderInsert);
 
@@ -42,12 +46,14 @@ export async function POST() {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully synchronized ${rawTenders.length} ISRO tenders from eproc.isro.gov.in`,
+      message: `WebCMD: Successfully synchronized ${rawTenders.length} ISRO tenders from eproc.isro.gov.in`,
+      engine: "WebCMD-Autonomous-Headless-Crawler-v2",
+      webcmd_telemetry: webcmdResult.telemetry,
       count: rawTenders.length,
       tenders: rawTenders,
     });
   } catch (error) {
-    console.error("Scrape error:", error);
+    console.error("WebCMD Scrape error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
