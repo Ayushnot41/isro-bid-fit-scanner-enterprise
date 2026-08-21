@@ -70,19 +70,34 @@
     @apply bg-zinc-950 text-zinc-100 antialiased;
   }
 
+  .hardware-accelerated {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  .gpu-layer {
+    contain: paint layout style;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    @apply w-2;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-zinc-900;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-700 rounded-full;
+    background: #27272a;
+    border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-zinc-600;
+    background: #3f3f46;
   }
 }
