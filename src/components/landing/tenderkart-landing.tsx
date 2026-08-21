@@ -114,10 +114,10 @@ export function TenderkartLanding() {
   };
 
   const handleInstantDemoLogin = () => {
-    document.cookie = "demo_session=true; path=/; max-age=86400";
+    document.cookie = "demo_session=true; path=/; max-age=86400; SameSite=Lax";
     setIsAuthenticated(true);
     setShowAuthGateModal(false);
-    router.push("/dashboard");
+    window.location.href = "/dashboard";
   };
 
   return (

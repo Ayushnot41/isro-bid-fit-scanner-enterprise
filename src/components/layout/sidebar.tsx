@@ -32,6 +32,19 @@ export function Sidebar() {
   const pathname = usePathname();
   const { signOut } = useClerk();
 
+  const handleSignOut = async () => {
+    document.cookie = "demo_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "sb-access-token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    try {
+      if (signOut) {
+        await signOut({ redirectUrl: "/login" });
+      }
+    } catch {
+      // Ignore
+    }
+    window.location.href = "/login";
+  };
+
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-[#0d0f12] border-r border-[#222730] flex flex-col z-40 selection:bg-emerald-500/30">
       {/* Brand Header */}
@@ -140,8 +153,9 @@ export function Sidebar() {
             <span className="text-[11px] font-mono text-zinc-400 truncate max-w-[80px]">Account</span>
           </div>
           <button
-            onClick={() => signOut({ redirectUrl: "/login" })}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            type="button"
+            onClick={handleSignOut}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
           >
             <LogOut className="w-3 h-3" />
             <span>Sign Out</span>
