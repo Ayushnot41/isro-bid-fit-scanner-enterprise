@@ -22,11 +22,13 @@ import {
   Radio,
   Zap,
   Terminal,
+  Bot,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AiEvaluationModal } from "./ai-evaluation-modal";
 import { PdfUploader } from "./pdf-uploader";
 import { WebCmdTerminal } from "./webcmd-terminal";
+import { TenderCoPilotDrawer } from "./tender-copilot-drawer";
 import { DEMO_VENDOR_PROFILE } from "@/lib/mock-data";
 import { evaluateBidFit } from "@/lib/evaluation/engine";
 
@@ -60,6 +62,8 @@ export function TenderList({ tenders: initialTenders, evaluations = [] }: Tender
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
+  const [activeCoPilotTender, setActiveCoPilotTender] = useState<ScrapedTender | null>(null);
+  const [isCoPilotOpen, setIsCoPilotOpen] = useState(false);
 
   // Local evaluations map
   const [evaluationsMap, setEvaluationsMap] = useState<Record<string, BidEvaluation>>(() => {
@@ -403,6 +407,19 @@ export function TenderList({ tenders: initialTenders, evaluations = [] }: Tender
                   ) : null}
 
                   <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setActiveCoPilotTender(tender);
+                      setIsCoPilotOpen(true);
+                    }}
+                    className="text-xs text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30"
+                  >
+                    <Bot className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Ask CoPilot</span>
+                  </Button>
+
+                  <Button
                     variant={evalResult ? "secondary" : "primary"}
                     size="sm"
                     onClick={() => handleEvaluate(tender)}
@@ -445,6 +462,13 @@ export function TenderList({ tenders: initialTenders, evaluations = [] }: Tender
         isOpen={showTerminal}
         onClose={() => setShowTerminal(false)}
         onScrapeSuccess={handleScrape}
+      />
+
+      {/* Interactive Tender CoPilot RAG Drawer */}
+      <TenderCoPilotDrawer
+        tender={activeCoPilotTender}
+        isOpen={isCoPilotOpen}
+        onClose={() => setIsCoPilotOpen(false)}
       />
     </div>
   );
