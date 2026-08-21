@@ -68,6 +68,16 @@ export function TenderkartLanding() {
     }
   }, []);
 
+  // Dismiss auth gate modal on Escape key
+  useEffect(() => {
+    if (!showAuthGateModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowAuthGateModal(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showAuthGateModal]);
+
   const filteredTenders = useMemo(() => {
     return INITIAL_SCRAPED_TENDERS.filter((tender) => {
       const matchesCenter =
@@ -623,7 +633,7 @@ export function TenderkartLanding() {
       {/* AUTH REQUIRED MODAL GATE */}
       <AnimatePresence>
         {showAuthGateModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
