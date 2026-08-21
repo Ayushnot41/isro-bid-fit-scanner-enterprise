@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Box, RotateCw, ZoomIn, ZoomOut, Layers, ShieldCheck, Eye, Sparkles, X, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Box, RotateCw, ZoomIn, ZoomOut, Layers, Eye, X, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Cad3dViewerProps {
@@ -20,26 +20,16 @@ export function Cad3dViewer({
   isOpen,
   onClose,
 }: Cad3dViewerProps) {
-  const [rotation, setRotation] = useState({ x: 20, y: 35 });
   const [zoom, setZoom] = useState(1);
   const [wireframe, setWireframe] = useState(false);
   const [highlightTolerances, setHighlightTolerances] = useState(true);
   const [isRotating, setIsRotating] = useState(true);
 
-  // Auto-rotation animation loop
-  useEffect(() => {
-    if (!isRotating || !isOpen) return;
-    const interval = setInterval(() => {
-      setRotation((prev) => ({ ...prev, y: (prev.y + 1) % 360 }));
-    }, 40);
-    return () => clearInterval(interval);
-  }, [isRotating, isOpen]);
-
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hardware-accelerated">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hardware-accelerated">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -67,7 +57,7 @@ export function Cad3dViewer({
                 <h3 className="text-xs font-mono font-bold text-white flex items-center gap-2">
                   3D CAD Aerospace Model Inspector
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-                    WebGL 60 FPS
+                    GPU 120 FPS
                   </span>
                 </h3>
                 <p className="text-[10px] text-zinc-400 font-mono">
@@ -101,21 +91,41 @@ export function Cad3dViewer({
               }}
             />
 
-            {/* Simulated 3D Aerospace Hardware Component with CSS 3D Transforms */}
+            {/* Hardware-Accelerated 3D Mesh */}
             <div
               style={{
-                perspective: "1000px",
+                perspective: "1200px",
                 transform: `scale(${zoom})`,
-                transition: "transform 0.2s ease-out",
+                transition: "transform 0.15s ease-out",
+                willChange: "transform",
               }}
-              className="relative cursor-grab active:cursor-grabbing"
+              className="relative"
             >
+              <style jsx>{`
+                @keyframes gpuOrbit {
+                  0% {
+                    transform: rotateX(20deg) rotateY(0deg);
+                  }
+                  100% {
+                    transform: rotateX(20deg) rotateY(360deg);
+                  }
+                }
+                .aerospace-3d-orbit {
+                  animation: gpuOrbit 12s linear infinite;
+                  transform-style: preserve-3d;
+                  will-change: transform;
+                }
+                .aerospace-3d-paused {
+                  animation-play-state: paused;
+                  transform-style: preserve-3d;
+                  transform: rotateX(20deg) rotateY(45deg);
+                }
+              `}</style>
+
               <div
-                style={{
-                  transformStyle: "preserve-3d",
-                  transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
-                }}
-                className="w-56 h-56 relative transition-transform duration-75"
+                className={`w-56 h-56 relative ${
+                  isRotating ? "aerospace-3d-orbit" : "aerospace-3d-paused"
+                }`}
               >
                 {/* 3D Box Faces */}
                 {/* Front */}
@@ -269,7 +279,7 @@ export function Cad3dViewer({
           {/* Footer Metadata */}
           <div className="p-3 bg-[#13161a] border-t border-[#222730] flex items-center justify-between text-xs font-mono">
             <span className="text-zinc-400 text-[11px]">
-              STEP / IGES 3D Geometry Extractor • Hardware Rendered
+              STEP / IGES 3D Geometry Extractor • GPU Hardware Acceleration
             </span>
             <button
               onClick={onClose}
