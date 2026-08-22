@@ -1,6 +1,7 @@
 # 🇮🇳 ISRO Bid-Fit Scanner Enterprise
 ### Autonomous E-Procurement Intelligence, Multi-Agent S2P Pipeline, WebCMD Scraper & Statutory MSME Compliance Engine
 
+[![Vercel Deployment](https://img.shields.io/badge/Vercel_Live_App-isro--bid--fit--scanner--enterprise.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://isro-bid-fit-scanner-enterprise.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2_App_Router-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5_Strict-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4_Dark_Aerospace-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
@@ -16,6 +17,20 @@
 ---
 
 ## 🚀 Live Vercel Production Links
+
+| Environment / Asset | Direct URL | Description |
+| :--- | :--- | :--- |
+| **🌐 Production Web App** | [**`isro-bid-fit-scanner-enterprise.vercel.app`**](https://isro-bid-fit-scanner-enterprise.vercel.app) | Live deployed Next.js application on Vercel |
+| **📊 Command Center HUD** | [**`isro-bid-fit-scanner-enterprise.vercel.app/dashboard`**](https://isro-bid-fit-scanner-enterprise.vercel.app/dashboard) | Live Bid-Fit Command Center & KPI telemetry |
+| **🛰️ Active ISRO RFPs** | [**`isro-bid-fit-scanner-enterprise.vercel.app/tenders`**](https://isro-bid-fit-scanner-enterprise.vercel.app/tenders) | Multi-center live ISRO tenders catalog |
+| **📑 Evaluations Vault** | [**`isro-bid-fit-scanner-enterprise.vercel.app/evaluations`**](https://isro-bid-fit-scanner-enterprise.vercel.app/evaluations) | Technical Dossier archive & fit scores |
+| **🎯 Competitor Intelligence** | [**`isro-bid-fit-scanner-enterprise.vercel.app/competitors`**](https://isro-bid-fit-scanner-enterprise.vercel.app/competitors) | L1 winning margins & co-bidding overlap |
+| **🛠️ Capability Matrix** | [**`isro-bid-fit-scanner-enterprise.vercel.app/profile`**](https://isro-bid-fit-scanner-enterprise.vercel.app/profile) | 5-Axis CNC GD&T & Udyam configuration |
+| **📄 Hackathon Pitch Dossier (PDF)** | [**`ISRO_BidFit_Scanner_Hackathon_Winning_Dossier.pdf`**](https://isro-bid-fit-scanner-enterprise.vercel.app/ISRO_BidFit_Scanner_Hackathon_Winning_Dossier.pdf) | Official PDF Pitch Deck for judges |
+
+---
+
+## 🛰️ What is ISRO Bid-Fit Scanner Enterprise? (In Simple Words)
 
 | Environment / Asset | Direct URL | Description |
 | :--- | :--- | :--- |

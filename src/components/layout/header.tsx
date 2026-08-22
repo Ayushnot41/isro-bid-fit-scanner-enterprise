@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useUser, UserButton } from "@clerk/nextjs";
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, ShieldCheck } from "lucide-react";
 import { NotificationsModal } from "./notifications-modal";
 
 export function Header() {
-  const { user } = useUser();
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
@@ -53,20 +51,18 @@ export function Header() {
         />
 
         <div className="flex items-center gap-2.5 pl-2 border-l border-[#222730]">
-          <UserButton
-            afterSignOutUrl="/login"
-            appearance={{
-              elements: {
-                avatarBox: "w-8 h-8 rounded-xl",
-              },
-            }}
-          />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-bold font-mono text-xs flex items-center justify-center shadow-md shadow-emerald-950/40 border border-emerald-400/30">
+            AP
+          </div>
           <div className="hidden sm:block text-left">
-            <p className="text-xs font-semibold text-white leading-none">
-              {user?.fullName || user?.primaryEmailAddress?.emailAddress?.split("@")[0] || "AeroPrecision India"}
-            </p>
+            <div className="flex items-center gap-1">
+              <p className="text-xs font-semibold text-white leading-none">
+                AeroPrecision India
+              </p>
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+            </div>
             <p className="text-[10px] font-mono text-zinc-500 leading-tight mt-0.5">
-              Verified Aerospace MSME
+              UDYAM-KR-03-0098421
             </p>
           </div>
         </div>

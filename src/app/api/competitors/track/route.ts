@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
 import { CompetitorIntelligenceService } from "@/lib/intelligence/competitor-service";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await currentUser();
-    const userId = user?.id || "anonymous-user";
+    const demoUser = req.cookies.get("demo_session")?.value;
+    const userId = demoUser ? "aeroprecision-msme" : "anonymous-user";
 
     const body = await req.json();
     const { vendor_id, vendor_name } = body;

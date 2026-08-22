@@ -216,12 +216,13 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
     return n.category === activeTab;
   });
 
-  if (!mounted) return null;
+  if (!mounted || !isOpen || typeof document === "undefined" || !document.body) {
+    return null;
+  }
 
   const modalContent = (
     <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-end p-3 sm:p-6 pt-16 sm:pt-6 overflow-hidden pointer-events-auto">
+      <div className="fixed inset-0 z-[100] flex items-start justify-end p-3 sm:p-6 pt-16 sm:pt-6 overflow-hidden pointer-events-auto">
           {/* Pure Dark Backdrop Overlay - Zero GPU Blur Latency */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -685,7 +686,6 @@ export function NotificationsModal({ isOpen, onClose }: NotificationsModalProps)
             </div>
           </motion.div>
         </div>
-      )}
     </AnimatePresence>
   );
 

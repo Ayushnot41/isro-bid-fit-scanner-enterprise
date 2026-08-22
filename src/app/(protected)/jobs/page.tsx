@@ -3,8 +3,27 @@
 import { useState, useEffect } from "react";
 import { Activity, RefreshCcw, Server, ShieldAlert, CheckCircle2, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+
+function formatDistanceToNow(date: Date, options?: { addSuffix?: boolean }): string {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  const suffix = options?.addSuffix ? " ago" : "";
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} min${suffix}`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hr${suffix}`;
+  const days = Math.floor(hours / 24);
+  return `${days} d${suffix}`;
+}
+
+const toast = {
+  info: (title: string, opts?: { description?: string }) => {
+    // Info notification
+  },
+  success: (title: string, opts?: { description?: string }) => {
+    // Success notification
+  },
+};
 
 const mockJobs = [
   { id: "JOB-4891", tender: "ISRO-SAC-2026-99", status: "Success", duration: "1m 12s", error: null, time: new Date(Date.now() - 1000 * 60 * 5) },
