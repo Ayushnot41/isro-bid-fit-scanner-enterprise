@@ -15,6 +15,20 @@
 
 ---
 
+## 🚀 Live Vercel Production Links
+
+| Environment / Asset | Direct URL | Description |
+| :--- | :--- | :--- |
+| **🚀 Production Web App** | [`isro-bid-fit-scanner-enterprise.vercel.app`](https://isro-bid-fit-scanner-enterprise.vercel.app) | Live Production Deployment |
+| **⚡ Command Center HUD** | [`isro-bid-fit-scanner-enterprise.vercel.app/dashboard`](https://isro-bid-fit-scanner-enterprise.vercel.app/dashboard) | Mission Control Dashboard |
+| **🛰️ Active ISRO RFPs** | [`isro-bid-fit-scanner-enterprise.vercel.app/tenders`](https://isro-bid-fit-scanner-enterprise.vercel.app/tenders) | Live ISRO Procurement Feed |
+| **📊 Evaluations Vault** | [`isro-bid-fit-scanner-enterprise.vercel.app/evaluations`](https://isro-bid-fit-scanner-enterprise.vercel.app/evaluations) | Technical & S2P Fit Score Engine |
+| **🎯 Competitor Intelligence** | [`isro-bid-fit-scanner-enterprise.vercel.app/competitors`](https://isro-bid-fit-scanner-enterprise.vercel.app/competitors) | Historical L1/L2 Tender Analytics |
+| **🛠️ Capability Matrix** | [`isro-bid-fit-scanner-enterprise.vercel.app/profile`](https://isro-bid-fit-scanner-enterprise.vercel.app/profile) | Plant & Machinery Matcher |
+| **📄 Hackathon Pitch Dossier (PDF)** | [`ISRO_BidFit_Scanner_Winning_Dossier.pdf`](https://isro-bid-fit-scanner-enterprise.vercel.app/dossier.pdf) | Pitch & Technical Spec PDF |
+
+---
+
 ## 📑 Table of Contents
 
 1. [Executive Summary & Problem Statement](#-executive-summary--problem-statement)
