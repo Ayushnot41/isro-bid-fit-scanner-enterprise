@@ -58,8 +58,6 @@ export function TenderCoPilotDrawer({ tender, isOpen, onClose }: TenderCoPilotDr
   // Lock background scroll when drawer is open
   useLockBodyScroll(Boolean(isOpen && tender));
 
-  if (!isOpen || !tender) return null;
-
   useEffect(() => {
     if (tender) {
       setMessages([

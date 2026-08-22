@@ -7,8 +7,9 @@ import { ScoreGauge } from "@/components/ui/score-gauge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
-import { Search, ChevronRight, FileText, Download, Trash2, Loader2, RefreshCw, Sparkles, Filter } from "lucide-react";
+import { Search, ChevronRight, FileText, Download, Trash2, Loader2, RefreshCw, Sparkles, Filter, Bot } from "lucide-react";
 import { AiEvaluationModal } from "@/components/tenders/ai-evaluation-modal";
+import { TenderCoPilotDrawer } from "@/components/tenders/tender-copilot-drawer";
 import { INITIAL_SCRAPED_TENDERS } from "@/lib/mock-data";
 
 interface EvaluationsVaultProps {
@@ -26,6 +27,8 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
   const [selectedEval, setSelectedEval] = useState<BidEvaluation | null>(null);
   const [selectedTender, setSelectedTender] = useState<ScrapedTender | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [copilotTender, setCopilotTender] = useState<ScrapedTender | null>(null);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
 
   const filteredEvals = useMemo(() => {
     return evaluations.filter((e) => {
@@ -243,10 +246,28 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   {evaluation.issuing_center || "ISRO HQ"} • {formatDate(evaluation.evaluated_at)}
                 </span>
-                <span className="text-emerald-400 font-semibold group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                  <span>Open Dossier</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const matchedTender =
+                        INITIAL_SCRAPED_TENDERS.find((t) => t.id === evaluation.tender_id) ||
+                        INITIAL_SCRAPED_TENDERS.find((t) => t.reference_number === evaluation.tender_reference) ||
+                        INITIAL_SCRAPED_TENDERS[0];
+                      setCopilotTender(matchedTender);
+                      setIsCopilotOpen(true);
+                    }}
+                    className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-cyan-500/10"
+                  >
+                    <Bot className="w-3.5 h-3.5" />
+                    <span>Ask CoPilot</span>
+                  </button>
+                  <span className="text-emerald-400 font-semibold group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                    <span>Open Dossier</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -262,6 +283,13 @@ export function EvaluationsVault({ initialEvaluations }: EvaluationsVaultProps) 
           onClose={() => setIsModalOpen(false)}
         />
       )}
+
+      {/* Tender CoPilot RAG Drawer */}
+      <TenderCoPilotDrawer
+        tender={copilotTender}
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+      />
     </div>
   );
 }
