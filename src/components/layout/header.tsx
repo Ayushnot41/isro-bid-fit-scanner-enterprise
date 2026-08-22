@@ -51,8 +51,12 @@ export function Header() {
         />
 
         <div className="flex items-center gap-2.5 pl-2 border-l border-[#222730]">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-bold font-mono text-xs flex items-center justify-center shadow-md shadow-emerald-950/40 border border-emerald-400/30">
-            AP
+          <div className="w-8 h-8 rounded-xl overflow-hidden bg-black border border-emerald-500/40 shadow-md shadow-emerald-950/40 flex items-center justify-center">
+            <img
+              src="/isro-bid-fit-logo.jpg"
+              alt="AeroPrecision India"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="hidden sm:block text-left">
             <div className="flex items-center gap-1">

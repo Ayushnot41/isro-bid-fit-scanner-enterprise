@@ -44,9 +44,13 @@ export default function RegisterPage() {
 
       <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-md">
         {/* Brand Header */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform shadow-lg shadow-emerald-950/40">
-            <Rocket className="w-5 h-5" />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-11 h-11 rounded-xl overflow-hidden bg-black border border-emerald-500/40 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform shadow-lg shadow-emerald-950/40">
+            <img
+              src="/isro-bid-fit-logo.jpg"
+              alt="ISRO Bid-Fit PRO Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
             <div className="flex items-center gap-1.5">

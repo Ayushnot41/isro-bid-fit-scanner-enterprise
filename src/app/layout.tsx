@@ -16,9 +16,14 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ISRO Bid-Fit Scanner Enterprise | Autonomous Procurement Intelligence",
+  title: "ISRO Bid-Fit PRO Enterprise | Autonomous Procurement Intelligence",
   description:
     "Autonomous E-Procurement Intelligence, GD&T Tolerance Engine and Statutory MSME Compliance Platform for ISRO Tenders.",
+  icons: {
+    icon: "/isro-bid-fit-logo.jpg",
+    shortcut: "/isro-bid-fit-logo.jpg",
+    apple: "/isro-bid-fit-logo.jpg",
+  },
 };
 
 export default function RootLayout({
