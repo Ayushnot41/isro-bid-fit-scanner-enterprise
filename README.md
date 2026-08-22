@@ -757,7 +757,7 @@ npm run start
 
 ## 👥 Contributors & Acknowledgements
 
-- **Engineering Lead**: Ayush ([@Ayushnot41](https://github.com/Ayushnot41))
+- **Engineering Lead**: LOKOJIT BISWAS([@lokojitcoder123](https://github.com/lokojitcoder123)) & Ayush ([@Ayushnot41](https://github.com/Ayushnot41)) 
 - **Domain**: Aerospace Procurement, Space-Grade Manufacturing & Autonomous WebCMD Crawling
 - **Organization Target**: Indian Space Research Organisation (ISRO) e-Procurement Portal (`eproc.isro.gov.in`)
 
