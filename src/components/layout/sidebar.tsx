@@ -83,35 +83,71 @@ export function Sidebar() {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={item.href} className="block relative">
               <motion.div
-                whileHover={{ x: 2 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ x: 4, scale: 1.01 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 450, damping: 30 }}
                 className={cn(
-                  "flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all relative",
+                  "flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all relative select-none",
                   isActive
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 shadow-sm shadow-emerald-500/10"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-[#13161a]"
+                    ? "text-white font-semibold shadow-md shadow-emerald-950/40"
+                    : "text-zinc-400 hover:text-white hover:bg-[#13161a]"
                 )}
               >
+                {/* Smooth Sliding Active Pill Background */}
                 {isActive && (
                   <motion.div
-                    layoutId="activeNav"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-400 rounded-r-full"
+                    layoutId="activeSidebarPill"
+                    className="absolute inset-0 bg-emerald-500/15 border border-emerald-500/35 rounded-xl -z-10 shadow-inner"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
                 )}
+
+                {/* Left Active Glow Notch */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeSidebarNotch"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-emerald-400 rounded-r-full shadow-[0_0_12px_rgba(52,211,153,0.85)]"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+
                 <div className="flex items-center gap-3">
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.label}</span>
-                </div>
-                {item.badge && (
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/15 text-cyan-400 font-mono border border-cyan-500/20">
-                    {item.badge}
+                  <motion.div
+                    animate={isActive ? { scale: 1.15, rotate: [0, -6, 6, 0] } : { scale: 1, rotate: 0 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                  >
+                    <item.icon
+                      className={cn(
+                        "w-4 h-4 transition-colors",
+                        isActive ? "text-emerald-400" : "text-zinc-400 group-hover:text-white"
+                      )}
+                    />
+                  </motion.div>
+                  <span className={cn("transition-colors", isActive ? "text-white font-bold" : "")}>
+                    {item.label}
                   </span>
+                </div>
+
+                {item.badge && (
+                  <motion.span
+                    initial={{ scale: 0.9 }}
+                    animate={{ scale: isActive ? [1, 1.1, 1] : 1 }}
+                    transition={{ duration: 0.4 }}
+                    className={cn(
+                      "px-1.5 py-0.5 rounded text-[9px] font-bold font-mono border transition-all",
+                      isActive
+                        ? "bg-emerald-500/25 text-emerald-300 border-emerald-500/40 shadow-sm"
+                        : "bg-cyan-500/15 text-cyan-400 border-cyan-500/20"
+                    )}
+                  >
+                    {item.badge}
+                  </motion.span>
                 )}
               </motion.div>
             </Link>
